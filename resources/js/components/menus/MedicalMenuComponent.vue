@@ -11,6 +11,7 @@ import {
   ChartBar,
   CalendarIcon,
   ChevronsUpDown,
+  StoreIcon,
 } from 'lucide-vue-next';
 
 import {
@@ -36,9 +37,17 @@ const medicalItems = [
       { title: 'Add Medicine', href: '/medicines/create', icon: PlusCircleIcon },
       { title: 'Manage Medicines', href: '/medicines', icon: ListFilter },
       { title: 'Medicine Categories', href: '/medicine-categories', icon: ListCollapse },
-      { title: 'Add Stock', href: '/medicine-stocks/create', icon: PlusCircleIcon },
-      { title: 'Stock History', href: '/medicine-stocks', icon: FileTextIcon },
     ],
+  },
+
+  {
+    title: 'Products',
+    icon: StoreIcon,
+    children: [
+      { title: 'Add Product', href: '/products/create', icon: PlusCircleIcon },
+      { title: 'Manage Products', href: '/products', icon: ListFilter },
+      { title: 'Product Categories', href: '/medicine-categories', icon: ListCollapse }
+    ]
   },
   {
     title: 'Prescriptions',
@@ -104,30 +113,20 @@ const medicalItems = [
   <div class="space-y-2">
     <DropdownMenu v-for="item in medicalItems" :key="item.title">
       <DropdownMenuTrigger as-child>
-        <SidebarMenuButton
-          size="lg"
-          class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-        >
+        <SidebarMenuButton size="lg"
+          class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
           <component :is="item.icon" />
           {{ item.title }}
           <ChevronsUpDown class="ml-auto size-4" />
         </SidebarMenuButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-        :side="isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'"
-        align="end"
-        :side-offset="4"
-      >
+      <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+        :side="isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'" align="end" :side-offset="4">
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            v-for="child in item.children"
-            :key="child.href"
-            as-child
-          >
+          <DropdownMenuItem v-for="child in item.children" :key="child.href" as-child>
             <Link class="flex items-center gap-2 w-full" :href="child.href" as="button">
-              <component :is="child.icon" class="size-4" v-if="child.icon" />
-              {{ child.title }}
+            <component :is="child.icon" class="size-4" v-if="child.icon" />
+            {{ child.title }}
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

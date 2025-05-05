@@ -8,16 +8,17 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('medicines', function (Blueprint $table) {
-            $table->uuid('id')->primary(); // Use UUID as primary key
+        Schema::create('products', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->string('name');
-            $table->string('brand');
-            $table->uuid('medicine_category_id')->nullable();
+            $table->string('category')->nullable();
             $table->text('description')->nullable();
+            $table->string('unit')->nullable();
             $table->timestamps();
         });
+
     }
 
     /**
@@ -25,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('medicines');
+        Schema::dropIfExists('products');
     }
 };
