@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             // UserSeeder::class,
             // MedicineSeeder::class,
             // MedicineUnitSeeder::class,
-            MedicineCategorySeeder::class,
+            // MedicineCategorySeeder::class,
+            ProductSeeder::class,
             // Add other seeders here
         ]);
     }

@@ -12,6 +12,8 @@ import {
   CalendarIcon,
   ChevronsUpDown,
   StoreIcon,
+  ListPlusIcon,
+  Settings2Icon,
 } from 'lucide-vue-next';
 
 import {
@@ -31,6 +33,19 @@ const { isMobile, state } = useSidebar();
 
 const medicalItems = [
   {
+    title: 'Stocks',
+    icon: ListPlusIcon,
+    children: [
+      { title: 'Add Items', href: '/stocks/create', icon: PlusCircleIcon },
+      { title: 'Medicine Stock', href: '/medicines', icon: PlusCircleIcon },
+      { title: 'Products Stock', href: '/medicine-categories', icon: Settings2Icon },
+      { title: 'Stock History', href: '/medicine-categories', icon: ListPlusIcon },
+      { title: 'Stock Managent', href: '/medicine-categories', icon: ListCollapse },
+      { title: 'Stock Reports', href: '/medicine-categories', icon: ListCollapse },
+    ],
+  },
+
+    {
     title: 'Medicines',
     icon: ListCheckIcon,
     children: [
@@ -46,7 +61,6 @@ const medicalItems = [
     children: [
       { title: 'Add Product', href: '/products/create', icon: PlusCircleIcon },
       { title: 'Manage Products', href: '/products', icon: ListFilter },
-      { title: 'Product Categories', href: '/medicine-categories', icon: ListCollapse }
     ]
   },
   {

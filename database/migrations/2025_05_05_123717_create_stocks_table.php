@@ -8,19 +8,18 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('stocks', function (Blueprint $table) {
-            $table->uuid('id')->primary(); // Use UUID as primary key
-            $table->uuid('medicine_id');
-            $table->integer('quantity');
-            $table->date('last_stocked_date');
+            $table->uuid('id')->primary();
+            $table->uuid('stockable_id');
+            $table->string('stockable_type');
+            $table->decimal('quantity', 10, 2);
+            $table->decimal('retail_price', 10, 2);
+            $table->decimal('wholesale_price', 10, 2);
             $table->timestamps();
-
-            $table->foreign('medicine_id')->references('id')->on('medicines')->onDelete('cascade');
         });
     }
-
 
     /**
      * Reverse the migrations.

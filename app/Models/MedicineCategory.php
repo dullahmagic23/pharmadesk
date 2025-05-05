@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 class MedicineCategory extends Model
 {
     use HasFactory;
+    protected $table = 'medicine_categories';
 
     public $incrementing = false;
     protected $keyType = 'string';

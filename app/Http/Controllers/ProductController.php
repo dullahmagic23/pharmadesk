@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Inertia\Inertia;
@@ -17,7 +16,9 @@ class ProductController extends Controller
 
     public function create()
     {
-        return Inertia::render('Products/Create');
+        return Inertia::render('Products/Create',[
+            'product' => []
+        ]);
     }
 
     public function store(Request $request)
@@ -42,7 +43,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail($id);
-        return Inertia::render('Products/Edit', [
+        return Inertia::render('Products/Create', [
             'product' => $product
         ]);
     }

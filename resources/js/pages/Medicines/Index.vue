@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Link } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 
-const medicines = usePage().props.medicines
+const {medicines} = usePage().props
 
 // Filter criteria
 const filterQuery = ref('')

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Stock;
 
 class Medicine extends Model
 {
@@ -34,5 +35,10 @@ class Medicine extends Model
     public function category()
     {
         return $this->belongsTo(MedicineCategory::class, 'medicine_category_id', 'id');
+    }
+
+    public function stocks()
+    {
+        return $this->morphMany(Stock::class, 'stockable');
     }
 }

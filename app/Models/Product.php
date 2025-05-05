@@ -1,7 +1,8 @@
 <?php
+namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-
+use App\Models\Stock; 
 class Product extends Model
 {
     public $incrementing = false;
@@ -11,8 +12,6 @@ class Product extends Model
         'name',
         'category',
         'description',
-        'price',
-        'stock',
         'unit',
     ];
 
@@ -25,6 +24,11 @@ class Product extends Model
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
+    }
+
+    public function stocks()
+    {
+        return $this->morphMany(Stock::class, 'stockable');
     }
 }
 
