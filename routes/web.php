@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\MedicineCategoryController;
+use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\StockHistoryController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -23,3 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::resource('medicine-categories', MedicineCategoryController::class);
 Route::resource('products', ProductController::class)->middleware('auth');
+Route::resource('stocks',StockController::class)->middleware('auth');
+Route::resource('stock-histories',StockHistoryController::class)->middleware('auth');
+Route::resource('patients', PatientController::class)->middleware('auth');
+Route::resource('doctors', DoctorController::class)->middleware('auth');

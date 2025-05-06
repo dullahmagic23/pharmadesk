@@ -8,20 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
+use App\Traits\HasUuid;
 
 class User extends Authenticatable
 {
-
+    use HasUuid;
      protected $keyType = 'string';
     public $incrementing = false;
-
-    // Generate UUID for new records
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->id = (string) Str::uuid(); // Automatically assign UUID when creating a record
-        });
-    }
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable,HasRoles;

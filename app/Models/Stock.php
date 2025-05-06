@@ -1,10 +1,18 @@
 <?php
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use App\Traits\HasUuid;
 
 class Stock extends Model
 {
+
+     use HasUuid;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'stockable_type', 'stockable_id', 'quantity', 'retail_price', 'wholesale_price',
     ];
@@ -17,18 +25,8 @@ class Stock extends Model
         return $this->morphTo();
     }
 
-    /**
-     * Boot the model to automatically assign UUID to the primary key.
-     */
-    protected static function boot()
+    public function histories():HasMany
     {
-        parent::boot();
-
-        // Automatically assign UUID to the model's primary key
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = Str::uuid(); // Generate UUID
-            }
-        });
+        return $this->hasMany(StockHistory::class);
     }
 }

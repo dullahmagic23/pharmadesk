@@ -8,6 +8,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
+
 const props = defineProps({
     product: Object,
 });
