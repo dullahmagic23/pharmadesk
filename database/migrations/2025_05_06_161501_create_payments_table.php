@@ -11,15 +11,14 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->uuid('id')->primary(); // Use UUID as primary key
-            $table->uuid('invoice_id');
+            $table->uuid('id')->primary();
+            $table->foreignUuid('invoice_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
-            $table->enum('payment_method', ['cash', 'credit_card', 'debit_card', 'online']);
-            $table->date('payment_date');
+            $table->enum('method', ['cash', 'card', 'insurance']);
+            $table->date('paid_at')->default(now());
             $table->timestamps();
-
-            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
         });
+
     }
 
 

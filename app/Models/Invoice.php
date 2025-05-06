@@ -2,19 +2,32 @@
 
 namespace App\Models;
 
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Invoice extends Model
 {
-     protected $keyType = 'string';
+    use HasUuid;
+    protected $keyType = 'string';
     public $incrementing = false;
 
-    // Generate UUID for new records
-    protected static function booted()
+    protected $fillable = [
+        'patient_id', 'invoice_number','invoice_date', 'balance', 'total', 'status',
+    ];
+
+    public function items()
     {
-        static::creating(function ($model) {
-            $model->id = (string) Str::uuid(); // Automatically assign UUID when creating a record
-        });
+        return $this->hasMany(InvoiceItem::class);
     }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
 }

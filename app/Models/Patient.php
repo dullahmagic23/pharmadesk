@@ -12,6 +12,7 @@ class Patient extends Model
 {
     use HasUuid;
     protected $keyType = 'string';
+    protected $primaryKey = 'id';
     public $incrementing = false;
     protected $fillable = [
         'first_name',

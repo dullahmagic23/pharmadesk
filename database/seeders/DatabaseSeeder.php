@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Doctor::factory(10)->create();
+//        Doctor::factory(10)->create();
         // User::factory(10)->create();
 
         // User::factory()->create([
@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         $this->call([
+            DosageSeeder::class
             // UserSeeder::class,
             // MedicineSeeder::class,
             // MedicineUnitSeeder::class,

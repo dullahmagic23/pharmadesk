@@ -85,6 +85,14 @@ const medicalItems = [
       { title: 'Manage Doctors', href: '/doctors', icon: ListFilter },
     ],
   },
+    {
+        title: 'Invoices',
+        icon: FileTextIcon,
+        children: [
+            { title: 'New Invoice', href: '/invoices/create', icon: PlusCircleIcon },
+            { title: 'Manage Invoices', href: '/invoices', icon: ListFilter },
+        ],
+    },
   {
     title: 'Appointments',
     icon: CalendarIcon,

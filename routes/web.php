@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PrescriptionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\MedicineController;
@@ -31,3 +33,6 @@ Route::resource('stocks',StockController::class)->middleware('auth');
 Route::resource('stock-histories',StockHistoryController::class)->middleware('auth');
 Route::resource('patients', PatientController::class)->middleware('auth');
 Route::resource('doctors', DoctorController::class)->middleware('auth');
+Route::resource('prescriptions', PrescriptionController::class)->middleware('auth');
+Route::get('/prescriptions/{prescription}/download', [PrescriptionController::class, 'download'])->name('prescriptions.download');
+Route::resource('invoices', InvoiceController::class)->middleware('auth');

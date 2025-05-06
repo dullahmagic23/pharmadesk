@@ -2,7 +2,7 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use App\Models\Stock; 
+use App\Models\Stock;
 class Product extends Model
 {
     public $incrementing = false;
@@ -26,9 +26,15 @@ class Product extends Model
         });
     }
 
-    public function stocks()
+    public function stock()
     {
-        return $this->morphMany(Stock::class, 'stockable');
+        return $this->morphOne(Stock::class, 'stockable');
     }
+
+    public function invoiceItems()
+    {
+        return $this->morphMany(InvoiceItem::class, 'billable');
+    }
+
 }
 

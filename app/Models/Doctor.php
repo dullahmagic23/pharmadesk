@@ -13,6 +13,7 @@ class Doctor extends Model
     use HasUuid;
 
     protected $keyType = 'string';
+    protected $primaryKey = 'id';
     public $incrementing = false;
 
     protected $fillable = [
