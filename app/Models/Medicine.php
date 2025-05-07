@@ -65,5 +65,10 @@ class Medicine extends Model
     {
         return $this->belongsTo(Patient::class);
     }
-
+    public function purchases()
+    {
+        return $this->morphToMany(Purchase::class, 'purchasable', 'purchasables')->withPivot(
+            'quantity', 'unit_cost', 'subtotal', 'batch_number', 'expiry_date'
+        );
+    }
 }

@@ -6,9 +6,9 @@ use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Supplier extends Model
+class Equipment extends Model
 {
-    /** @use HasFactory<\Database\Factories\SupplierFactory> */
+    /** @use HasFactory<\Database\Factories\EquipmentFactory> */
     use HasFactory;
 
     use HasUuid;
@@ -16,15 +16,16 @@ class Supplier extends Model
     public $incrementing = false;
 
     protected $fillable = [
+        'supplier_id',
         'name',
-        'contact_name',
-        'email',
-        'phone_number',
-        'address',
+        'serial_number',
+        'manufacturer',
+        'purchase_date',
+        'status',
     ];
 
-    public function equipments()
+    public function supplier()
     {
-        return $this->hasMany(Equipment::class);
+        return $this->belongsTo(Supplier::class);
     }
 }

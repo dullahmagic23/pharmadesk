@@ -1,9 +1,16 @@
 <template>
     <AppLayout>
         <div class="container p-6">
-            <h2 class="text-xl font-semibold text-gray-800 leading-tight">
-                Invoice Details
-            </h2>
+            <div class="flex justify-between">
+                <h2 class="text-xl font-semibold text-gray-800 leading-tight">
+                    Invoice Details
+                </h2>
+                <a :href="route('invoices.print',invoice.id)" class="flex ">
+                    <PrinterIcon />
+                    Print
+                </a>
+            </div>
+
             <div class="bg-white rounded shadow p-6">
                 <!-- Invoice Metadata -->
                 <div class="mb-4 space-y-2">
@@ -52,6 +59,8 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { computed } from 'vue'
 import currency from '../../modules/currecyFormatter.js';
+import { Link } from '@inertiajs/vue3';
+import {PrinterIcon} from 'lucide-vue-next';
 
 const props = defineProps({
     invoice: Object

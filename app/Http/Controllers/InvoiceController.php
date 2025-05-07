@@ -7,6 +7,7 @@ use App\Models\InvoiceItem;
 use App\Models\Patient;
 use App\Models\Product;
 use App\Models\Service;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -107,5 +108,14 @@ class InvoiceController extends Controller
     {
         $invoice->delete();
         return back()->with('success', 'Invoice deleted.');
+    }
+
+    public function print(Invoice $invoice)
+    {
+        $invoice->load(['patient', 'items.billable']);
+
+        $pdf = Pdf::loadView('pdf.invoice', compact('invoice'));
+
+        return $pdf->stream("invoice-{$invoice->invoice_number}.pdf");
     }
 }

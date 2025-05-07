@@ -36,5 +36,12 @@ class Product extends Model
         return $this->morphMany(InvoiceItem::class, 'billable');
     }
 
+    public function purchases()
+    {
+        return $this->morphToMany(Purchase::class, 'purchasable', 'purchasables')->withPivot(
+            'quantity', 'unit_cost', 'subtotal', 'batch_number', 'expiry_date'
+        );
+    }
+
 }
 
