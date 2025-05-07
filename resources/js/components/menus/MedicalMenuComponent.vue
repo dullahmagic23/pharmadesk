@@ -10,6 +10,7 @@ import {
     ChartBar,
     CalendarIcon,
     ChevronsUpDown,
+    ChevronRightCircle,
     StoreIcon,
     ListPlusIcon,
     Settings2Icon, HeartIcon, UsersRoundIcon
@@ -26,7 +27,7 @@ import { SidebarMenuButton } from '@/components/ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import SidebarDropdownMenuItem from '@/components/SidebarDropdownMenuItem.vue';
 
-const { isMobile, state } = useSidebar();
+const { isMobile } = useSidebar();
 
 const medicalItems = [
     {
@@ -138,8 +139,8 @@ const medicalItems = [
                 children: [
                     { title: 'New Bill', href: '/bills/create', icon: PlusCircleIcon },
                     { title: 'Manage Bills', href: '/bills', icon: ListFilter },
-                    {title: 'Bill Payment', href: '/bills/bill-payments', icon: ListFilter},
-                    {title: 'Payments', href: '/bills/payments', icon: ListFilter},
+                    {title: 'Bill Payment', href: '/bill-payments/create', icon: ListFilter},
+                    {title: 'Payment History', href: '/bill-payments', icon: ListFilter},
                 ],
             },
             {
@@ -150,15 +151,7 @@ const medicalItems = [
                     { title: 'New Purchase Order', href: '/purchases/create', icon: PlusCircleIcon },
                     { title: 'Manage Purchase Orders', href: '/purchases', icon: ListFilter },
                 ],
-            },
-            {
-                title: 'Inventory',
-                icon: ListCheckIcon,
-                children: [
-                    { title: 'Add Item', href: '/pharmacy-inventory/create', icon: PlusCircleIcon },
-                    { title: 'Manage Inventory', href: '/pharmacy-inventory', icon: ListFilter },
-                ],
-            },
+            }
         ],
     },
     {
@@ -196,7 +189,7 @@ const medicalItems = [
                 >
                     <component :is="item.icon" />
                     {{ item.title }}
-                    <ChevronsUpDown class="ml-auto size-4" />
+                    <ChevronRightCircle class="ml-auto size-4" />
                 </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent

@@ -17,4 +17,10 @@ class Vendor extends Model
     {
         return $this->hasMany(Purchase::class);
     }
+
+    public function bills()
+    {
+        return $this->morphMany(Bill::class, 'billable');
+    }
+
 }

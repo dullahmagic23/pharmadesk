@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\BillController;
+use App\Http\Controllers\BillPaymentController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\PatientController;
@@ -18,8 +21,8 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\StockHistoryController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+    return Inertia::render('Dashboard');
+})->name('home')->middleware('auth');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
@@ -48,4 +51,6 @@ Route::resource('purchases', PurchaseController::class)->middleware('auth');
 Route::get('/purchases/{purchase}/print', [PurchaseController::class, 'print'])->name('purchases.print');
 Route::resource('suppliers', SupplierController::class)->middleware('auth');
 Route::resource('equipments', EquipmentController::class)->middleware('auth');
-
+Route::resource('bills', BillController::class)->middleware('auth');
+Route::resource('bill-payments',BillPaymentController::class)->middleware('auth');
+Route::resource('expenses',ExpenseController::class)->middleware('auth');

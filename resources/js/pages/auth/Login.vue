@@ -29,7 +29,7 @@ const submit = () => {
         <div class="w-full md:w-1/2 flex items-center justify-center px-6 bg-white">
             <div class="w-full max-w-md space-y-8">
                 <div class="text-center">
-                    <h1 class="text-2xl font-bold text-gray-900">Log in to PharmaDesk</h1>
+                    <h1 class="text-2xl font-bold text-gray-900">Welcome to PharmaDesk</h1>
                     <p class="mt-1 text-sm text-gray-500">Enter your credentials to access your account.</p>
                 </div>
 

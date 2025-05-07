@@ -7,7 +7,7 @@ import {
     DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Link } from '@inertiajs/vue3';
-import { ChevronsUpDown } from 'lucide-vue-next';
+import { ChevronRightIcon } from 'lucide-vue-next';
 
 defineProps<{
     item: {
@@ -32,7 +32,7 @@ defineOptions({
             >
                 <component :is="item.icon" class="size-4" v-if="item.icon" />
                 <span class="flex-1 text-left">{{ item.title }}</span>
-                <ChevronsUpDown class="ml-auto size-4 text-muted-foreground" />
+                <ChevronRightIcon class="ml-auto size-4 text-muted-foreground" />
             </div>
         </DropdownMenuTrigger>
 

@@ -27,4 +27,10 @@ class Supplier extends Model
     {
         return $this->hasMany(Equipment::class);
     }
+
+    public function bills()
+    {
+        return $this->morphMany(Bill::class, 'billable');
+    }
+
 }
