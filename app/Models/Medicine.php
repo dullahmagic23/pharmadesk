@@ -71,4 +71,9 @@ class Medicine extends Model
             'quantity', 'unit_cost', 'subtotal', 'batch_number', 'expiry_date'
         );
     }
+
+    public function saleItems()
+    {
+        return $this->morphMany(SaleItem::class, 'sellable');
+    }
 }

@@ -113,4 +113,29 @@ class StockController extends Controller
     {
         //
     }
+
+    public function getPrice(Request $request)
+    {
+        $request->validate([
+            'sellable_type' => 'required|in:Medicine,Product',
+            'sellable_id' => 'required|uuid',
+            'sale_type' => 'required|in:retail,wholesale',
+        ]);
+
+        $class = 'App\\Models\\' . $request->sellable_type;
+
+        $model = $class::findOrFail($request->sellable_id);
+        $stock = $model->stock;
+
+        if (!$stock) {
+            return response()->json(['price' => 0]);
+        }
+
+        return response()->json([
+            'price' => $request->sale_type === 'retail'
+                ? $stock->retail_price
+                : $stock->wholesale_price
+        ]);
+    }
+
 }

@@ -20,7 +20,7 @@
         <tbody>
           <tr v-for="payment in payments" :key="payment.id" class="border-t">
             <td class="p-2">{{ payment.bill.billable.name }}</td>
-            <td class="p-2">{{ payment.bill.billable_type }}</td>
+            <td class="p-2">{{ payment.bill.type }}</td>
             <td class="p-2">{{ payment.payment_date }}</td>
             <td class="p-2"> {{ currency(payment.amount) }}</td>
           </tr>

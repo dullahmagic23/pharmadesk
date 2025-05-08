@@ -3,18 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use App\Traits\HasUuid;
 
 class Customer extends Model
 {
+    use HasUuid;
      protected $keyType = 'string';
     public $incrementing = false;
 
-    // Generate UUID for new records
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->id = (string) Str::uuid(); // Automatically assign UUID when creating a record
-        });
-    }
+    protected $fillable = ['name','email','phone','address'];
 }

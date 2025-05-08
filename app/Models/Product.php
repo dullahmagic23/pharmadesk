@@ -43,5 +43,10 @@ class Product extends Model
         );
     }
 
+    public function saleItems()
+    {
+        return $this->morphMany(SaleItem::class, 'sellable');
+    }
+
 }
 

@@ -1,7 +1,7 @@
 <?php
-
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\BillPaymentController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ExpenseController;
@@ -19,6 +19,8 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\StockHistoryController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SalePaymentController;
 
 Route::get('/', function () {
     return Inertia::render('Dashboard');
@@ -54,3 +56,7 @@ Route::resource('equipments', EquipmentController::class)->middleware('auth');
 Route::resource('bills', BillController::class)->middleware('auth');
 Route::resource('bill-payments',BillPaymentController::class)->middleware('auth');
 Route::resource('expenses',ExpenseController::class)->middleware('auth');
+Route::resource('customers',CustomerController::class)->middleware('auth');
+Route::resource('sales', SaleController::class)->middleware('auth');
+Route::get('/sales/{sale}/add-payments',[SalePaymentController::class,'addPayments'])->name('sales.add-payments')->middleware('auth');
+Route::post('/sales/{sale}/payments', [SalePaymentController::class, 'store'])->name('sales.payments.store');

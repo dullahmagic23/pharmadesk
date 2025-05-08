@@ -9,11 +9,10 @@ import {
     UsersRound,
     ChartBar,
     CalendarIcon,
-    ChevronsUpDown,
     ChevronRightCircle,
     StoreIcon,
     ListPlusIcon,
-    Settings2Icon, HeartIcon, UsersRoundIcon
+    Settings2Icon, HeartIcon, UsersRoundIcon, CircleDollarSignIcon
 } from 'lucide-vue-next';
 
 import {
@@ -30,6 +29,15 @@ import SidebarDropdownMenuItem from '@/components/SidebarDropdownMenuItem.vue';
 const { isMobile } = useSidebar();
 
 const medicalItems = [
+    {
+        title: 'Sales',
+        icon: CircleDollarSignIcon,
+        children: [
+            { title: 'New Sale', href: '/sales/create', icon: PlusCircleIcon },
+            { title: 'Manage Sales', href: '/sales', icon: ListFilter },
+        ],
+    },
+
     {
         title: 'Stocks',
         icon: ListPlusIcon,
@@ -68,20 +76,34 @@ const medicalItems = [
         ],
     },
     {
-        title: 'Patients',
+        title:  'People',
         icon: UsersRound,
         children: [
-            { title: 'Register Patient', href: '/patients/create', icon: PlusCircleIcon },
-            { title: 'Manage Patients', href: '/patients', icon: ListFilter },
-        ],
-    },
-    {
-        title: 'Doctors',
-        icon: LandmarkIcon,
-        children: [
-            { title: 'Add Doctor', href: '/doctors/create', icon: PlusCircleIcon },
-            { title: 'Manage Doctors', href: '/doctors', icon: ListFilter },
-        ],
+            {
+                title: 'Customers',
+                icon: UsersRound,
+                children: [
+                    { title: 'Register Customers', href: '/customers/create', icon: PlusCircleIcon },
+                    { title: 'Manage Customer', href: '/customers', icon: ListFilter },
+                ],
+            },
+            {
+                title: 'Patients',
+                icon: UsersRound,
+                children: [
+                    { title: 'Register Patient', href: '/patients/create', icon: PlusCircleIcon },
+                    { title: 'Manage Patients', href: '/patients', icon: ListFilter },
+                ],
+            },
+            {
+                title: 'Doctors',
+                icon: LandmarkIcon,
+                children: [
+                    { title: 'Add Doctor', href: '/doctors/create', icon: PlusCircleIcon },
+                    { title: 'Manage Doctors', href: '/doctors', icon: ListFilter },
+                ],
+            },
+        ]
     },
     {
         title: 'Accounting',
