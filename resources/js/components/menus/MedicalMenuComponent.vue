@@ -12,7 +12,12 @@ import {
     ChevronRightCircle,
     StoreIcon,
     ListPlusIcon,
-    Settings2Icon, HeartIcon, UsersRoundIcon, CircleDollarSignIcon
+    Settings2Icon, HeartIcon, UsersRoundIcon, CircleDollarSignIcon,
+    Users2Icon,
+    UserPlus,
+    UserSquare2Icon,
+    Users2,
+    FileImageIcon
 } from 'lucide-vue-next';
 
 import {
@@ -194,9 +199,25 @@ const medicalItems = [
     },
 
     {
+        title: 'Users',
+        icon: Users2Icon,
+        children: [
+            {title:'Add users',href:'/users/create', icon:UserPlus},
+            {title:'Manage users',href:'/users', icon:UserSquare2Icon},
+            {title:'User Logs',href:'/users/activity-logs', icon:Users2},
+        ],
+    },
+    {
         title: 'Reports',
         icon: ChartBar,
-        children: [{ title: 'View Reports', href: '/reports', icon: FileTextIcon }],
+        children: [
+            {title: 'Sales Report',href:'/reports/sales',icon: FileImageIcon},
+            {title: 'Customers Report',href:'/reports/sales',icon: FileImageIcon},
+            {title: 'Inventory Report',href:'/reports/sales',icon: FileImageIcon},
+            {title: 'Stock Report',href:'/reports/sales',icon: FileImageIcon},
+            {title: 'Purchase Report',href:'/reports/sales',icon: FileImageIcon},
+            {title: 'Profit & Loss Report',href:'/reports/sales',icon: FileImageIcon},
+        ],
     },
 ];
 </script>

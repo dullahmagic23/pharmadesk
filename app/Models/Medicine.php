@@ -3,10 +3,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Medicine extends Model
 {
+    use LogsActivity;
     use HasFactory;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('medicine')
+            ->logAll()
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn(string $eventName) => "Medicine was {$eventName}");
+    }
+
     protected $fillable = [
         'id',
         'name',
@@ -14,7 +27,7 @@ class Medicine extends Model
         'medicine_category_id',
         'description',
     ];
-     protected $keyType = 'string';
+    protected $keyType = 'string';
     public $incrementing = false;
 
     // Generate UUID for new records
@@ -68,7 +81,11 @@ class Medicine extends Model
     public function purchases()
     {
         return $this->morphToMany(Purchase::class, 'purchasable', 'purchasables')->withPivot(
-            'quantity', 'unit_cost', 'subtotal', 'batch_number', 'expiry_date'
+            'quantity',
+            'unit_cost',
+            'subtotal',
+            'batch_number',
+            'expiry_date'
         );
     }
 

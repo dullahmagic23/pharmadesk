@@ -8,6 +8,7 @@ class StockHistory extends Model
 {
     use HasUlids;
      protected $keyType = 'string';
+     protected $table = 'stock_histories';
      public $incrementing = false;
     protected $fillable = ['stock_id', 'quantity', 'date'];
 

@@ -1,23 +1,12 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { computed, ref, watch } from 'vue';
+import { router, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table } from '@/components/ui/table';
 import currency from '@/modules/currecyFormatter';
-
-// Define props
-interface Filters {
-    search: string;
-    buyer_type: string;
-    date_from: string;
-    date_to: string;
-    min_amount: string;
-    max_amount: string;
-    status: string;
-}
 
 const props = defineProps<{
     sales: {
@@ -27,52 +16,29 @@ const props = defineProps<{
         to: number;
         total: number;
     };
-    filters: Filters;
 }>();
 
-// Initialize filter state with values from the URL or default values
-const filters = ref({
-    search: props.filters?.search || '',
-    buyer_type: props.filters?.buyer_type || '',
-    date_from: props.filters?.date_from || '',
-    date_to: props.filters?.date_to || '',
-    min_amount: props.filters?.min_amount || '',
-    max_amount: props.filters?.max_amount || '',
-    status: props.filters?.status || '',
-});
+const form = useForm({
+    buyer_name: '',
+    start_date: '',
+    end_date: ''
+})
 
-// Watch for filter changes and update URL
-watch(
-    filters,
-    (newFilters) => {
-        router.get(
-            route('sales.index'),
-            {
-                ...newFilters,
-                page: 1,
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
-            },
-        );
-    },
-    { deep: true },
-);
+const filteredSales = computed(() => {
+    return props.sales.data.filter((sale) => {
+        const matchesBuyerName = form.buyer_name
+            ? sale.buyer_name.toLowerCase().includes(form.buyer_name.toLowerCase())
+            : true;
+        const matchesStartDate = form.start_date
+            ? new Date(sale.created_at) >= new Date(form.start_date)
+            : true;
+        const matchesEndDate = form.end_date
+            ? new Date(sale.created_at) <= new Date(form.end_date)
+            : true;
 
-// Clear all filters
-function resetFilters() {
-    filters.value = {
-        search: '',
-        buyer_type: '',
-        date_from: '',
-        date_to: '',
-        min_amount: '',
-        max_amount: '',
-        status: '',
-    };
-}
+        return matchesBuyerName && matchesStartDate && matchesEndDate;
+    });
+})
 </script>
 
 <template>
@@ -80,7 +46,18 @@ function resetFilters() {
         <div class="container mx-auto p-6">
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-semibold">Sales</h1>
-                <Button as="a" :href="route('sales.create')">New Sale</Button>
+                <div class="justify-end space-x-4">
+                    <Link :href="route('sales.create')">
+                    <Button>New Sale</Button>
+                    </Link>
+                    <a :href="`/sales/export/pdf?start_date=${form.start_date}&end_date=${form.end_date}`">
+                        <Button  variant="destructive">Export to pdf</Button>
+                    </a>
+
+                    <a href="">
+                        <Button  variant="ghost">Export to Excel</Button>
+                    </a>
+                </div>
             </div>
 
             <!-- Filters Section -->
@@ -90,63 +67,15 @@ function resetFilters() {
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <!-- Search Field -->
                     <div>
-                        <Input v-model="filters.search" placeholder="Search by invoice number, buyer name..." class="w-full" />
+                        <Input v-model="form.buyer_name" placeholder="Buyer name..." class="w-full" />
                     </div>
-
-                    <!-- Buyer Type Filter -->
                     <div>
-                        <Select v-model="filters.buyer_type">
-                            <SelectTrigger class="w-full">
-                                <SelectValue placeholder="Filter by buyer type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Buyer Types</SelectLabel>
-                                    <SelectLabel>All Types</SelectLabel>
-                                    <SelectItem value="Customer">Customer</SelectItem>
-                                    <SelectItem value="Patient">Patient</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <!-- Status Filter -->
-                    <div>
-                        <Select v-model="filters.status">
-                            <SelectTrigger class="w-full">
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Status</SelectLabel>
-                                    <SelectLabel>All Statuses</SelectLabel>
-                                    <SelectItem value="paid">Paid</SelectItem>
-                                    <SelectItem value="partial">Partially Paid</SelectItem>
-                                    <SelectItem value="unpaid">Unpaid</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <!-- Date Range Filters -->
-                    <div>
-                        <Input v-model="filters.date_from" type="date" placeholder="From Date" class="w-full" />
+                        <Input v-model="form.start_date" type="date" placeholder="From Date" class="w-full" />
                     </div>
 
                     <div>
-                        <Input v-model="filters.date_to" type="date" placeholder="To Date" class="w-full" />
+                        <Input v-model="form.end_date" type="date" placeholder="To Date" class="w-full" />
                     </div>
-
-                    <!-- Amount Range Filters -->
-                    <div class="flex space-x-2">
-                        <Input v-model="filters.min_amount" type="number" placeholder="Min Amount" class="w-full" />
-                        <Input v-model="filters.max_amount" type="number" placeholder="Max Amount" class="w-full" />
-                    </div>
-                </div>
-
-                <!-- Reset Filters -->
-                <div class="mt-4 flex justify-end">
-                    <Button variant="outline" @click="resetFilters">Reset Filters</Button>
                 </div>
             </div>
 
@@ -166,7 +95,7 @@ function resetFilters() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="my-1" v-for="sale in sales.data" :key="sale.id">
+                        <tr class="my-1" v-for="sale in filteredSales" :key="sale.id">
                             <td>{{ sale.created_at }}</td>
                             <td>{{ sale.buyer_name }}</td>
                             <td>{{ sale.items_count }}</td>
@@ -174,21 +103,25 @@ function resetFilters() {
                             <td>{{ currency(sale.paid) }}</td>
                             <td>{{ currency(sale.balance) }}</td>
                             <td>
-                                <span
-                                    :class="{
-                                        'rounded px-2 py-1 text-xs font-medium': true,
-                                        'bg-green-100 text-green-800': sale.status === 'paid',
-                                        'bg-yellow-100 text-yellow-800': sale.status === 'partial',
-                                        'bg-red-100 text-red-800': sale.status === 'unpaid',
-                                    }"
-                                >
-                                    {{ sale.status === 'paid' ? 'Paid' : sale.status === 'partial' ? 'Partially Paid' : 'Unpaid' }}
+                                <span :class="{
+                                    'rounded px-2 py-1 text-xs font-medium': true,
+                                    'bg-green-100 text-green-800': sale.status === 'paid',
+                                    'bg-yellow-100 text-yellow-800': sale.status === 'partial',
+                                    'bg-red-100 text-red-800': sale.status === 'unpaid',
+                                }">
+                                    {{ sale.status === 'paid' ? 'Paid' : sale.status === 'partial' ? 'Partially Paid' :
+                                        'Unpaid' }}
                                 </span>
                             </td>
                             <td>
                                 <div class="flex space-x-2">
-                                    <Button as="a" :href="route('sales.show', sale.id)" variant="ghost" size="sm"> View </Button>
-                                    <Button as="a" v-if="sale.status !== 'paid'" :href="route('sales.add-payments', sale.id)" size="sm" variant="default">Add payment</Button>
+                                    <Link :href="route('sales.show', sale.id)">
+                                    <Button variant="ghost" size="sm"> View</Button>
+                                    </Link>
+                                    <Link :href="route('sales.add-payments', sale.id)">
+                                    <Button v-if="sale.status !== 'paid'" size="sm" variant="default">Add
+                                        payment</Button>
+                                    </Link>
                                 </div>
                             </td>
                         </tr>
@@ -205,14 +138,9 @@ function resetFilters() {
                     <div class="flex items-center justify-between">
                         <div>Showing {{ sales.from }} to {{ sales.to }} of {{ sales.total }} results</div>
                         <div class="flex space-x-1">
-                            <Button
-                                v-for="(link, i) in sales.links"
-                                :key="i"
-                                :disabled="!link.url || link.active"
-                                :variant="link.active ? 'default' : 'outline'"
-                                @click="router.get(link.url)"
-                                v-html="link.label"
-                            />
+                            <Button v-for="(link, i) in sales.links" :key="i" :disabled="!link.url || link.active"
+                                :variant="link.active ? 'default' : 'outline'" @click="router.get(link.url)"
+                                v-html="link.label" />
                         </div>
                     </div>
                 </div>
