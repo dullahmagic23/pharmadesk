@@ -1,13 +1,14 @@
 <?php
 namespace App\Models;
 
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class MedicineUnit extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
     protected $table = 'medicine_units';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -16,9 +17,8 @@ class MedicineUnit extends Model
         'id',
         'medicine_id',
         'unit_name',
-        'retail_price',
-        'wholesale_price',
-        'wholesale_min_quantity',
+        'abbreviation',
+        'description',
     ];
 
     protected static function booted(): void

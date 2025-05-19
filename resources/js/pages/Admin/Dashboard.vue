@@ -1,11 +1,15 @@
 <template>
-    <AppLayout title="Admin Dashboard">
+    <AppLayout :breadcrumbs="breadcrumb">
+        <Head title="Admin Dashboard"/>
         <div class="container mx-auto p-6">
             <!-- Welcome Section -->
             <div class="text-left mb-6 bg-gray-50 p-6 rounded-2xl shadow-md">
                 <h1 class="text-4xl font-extrabold text-gray-800">Welcome, {{ page.props.auth.user.name }}</h1>
-                <h4 class="text-lg text-gray-600 mt-2">Email: {{ page.props.auth.user.email }}</h4>
-                <p class="text-sm text-gray-500 mt-1 capitalize">{{ page.props.auth.user.roles?.[0]?.name || 'No role assigned' }}</p>
+                <h4 class="text-lg text-gray-600 mt-2"> {{ page.props.auth.user.email }}</h4>
+                <p class="text-sm text-gray-500 mt-1 capitalize font-black">{{ page.props.auth.user.roles?.[0]?.name || 'No role assigned' }}</p>
+                <div class="flex justify-end">
+                    <small class="italic"><strong>Quote of Today:</strong> {{ page.props.quote.message }}</small>
+                </div>
             </div>
 
             <!-- Stats Section -->
@@ -65,8 +69,8 @@
 </template>
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
-import Card from '@/Components/Dashboard/Card.vue'
-import { usePage, Link } from '@inertiajs/vue3'
+import Card from '@/components/Dashboard/Card.vue'
+import { usePage, Link, Head } from '@inertiajs/vue3'
 import { Users, FileBarChart2, UserPlus, ClipboardList } from 'lucide-vue-next'
 
 const page = usePage()
@@ -84,5 +88,9 @@ const quickLinks = [
     { title: 'Add New Doctor', href: '/doctors/create', icon: UserPlus },
     { title: 'System Reports', href: '/reports', icon: FileBarChart2 },
     { title: 'Audit Logs', href: '/admin/logs', icon: ClipboardList },
+]
+
+const breadcrumb = [
+    {title:'Admin Dashboard', href:'/admin/dashboard'}
 ]
 </script>

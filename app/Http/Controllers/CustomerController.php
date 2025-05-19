@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Services\CustomerCacheService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(CustomerCacheService $customerCache)
     {
+        $customerCache->all();
         return Inertia::render('Customers/Index', [
             'customers' => Customer::latest()->get(),
         ]);
@@ -21,7 +23,7 @@ class CustomerController extends Controller
         return Inertia::render('Customers/Create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, CustomerCacheService $customerCache)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -31,7 +33,8 @@ class CustomerController extends Controller
         ]);
 
         Customer::create(array_merge($data, ['id' => (string) Str::uuid()]));
-
+        $customerCache->clear();
+        $customerCache->all();
         return redirect()->route('customers.index')->with('success', 'Customer created successfully.');;
     }
 
@@ -45,7 +48,7 @@ class CustomerController extends Controller
         return Inertia::render('Customers/Edit', compact('customer'));
     }
 
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, Customer $customer,CustomerCacheService $customerCache)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -55,7 +58,8 @@ class CustomerController extends Controller
         ]);
 
         $customer->update($data);
-
+        $customerCache->clear();
+        $customerCache->all();
         return redirect()->route('customers.index')->with('success', 'Customer updated successfully.');
     }
 

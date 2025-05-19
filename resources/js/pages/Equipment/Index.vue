@@ -19,7 +19,7 @@ const form = useForm({
         <div class="p-4 space-y-4">
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-semibold">Equipment</h1>
-                <Link href="/equipment/create" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <Link href="/equipments/create" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                     <PlusCircle class="mr-2 w-4 h-4" />
                     Add Equipment
                 </Link>

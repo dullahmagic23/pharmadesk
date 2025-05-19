@@ -93,7 +93,7 @@
 
                 <!-- Submit -->
                 <div class="col-span-1 md:col-span-2">
-                    <Button type="submit" :disabled="form.processing">Save</Button>
+                    <Button type="submit" :disabled="form.processing">Update</Button>
                 </div>
             </form>
         </div>
@@ -115,17 +115,18 @@ import Input from '@/components/ui/input/Input.vue';
 const props = defineProps({
     products: Array,
     medicines: Array,
+    stock: Array
 });
 
 // Reactive form
 const form = useForm({
-    stockable_type: '',
-    stockable_id: '',
-    quantity: '',
-    retail_price: '',
-    wholesale_price: '',
-    date: new Date().toISOString().slice(0, 10),
-    selected_unit: '',
+    stockable_type: props.stock.stockable_type,
+    stockable_id: props.stock.stockable_id,
+    quantity: props.stock.quantity,
+    retail_price: props.stock.retail_price,
+    wholesale_price: props.stock.wholesale_price,
+    date: props.stock.date,
+    selected_unit: props.stock.unit_id,
 });
 
 const selectedMedicineUnits = computed(() => {
@@ -149,7 +150,7 @@ const filteredItems = computed(() => {
 });
 
 const submit = () => {
-    form.post(route('stocks.store'));
+    form.put(route('stocks.update', props.stock.id));
 };
 const breadcrumbs = [
     {title: "All Stocks", href: "/stocks"},

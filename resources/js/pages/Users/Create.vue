@@ -1,5 +1,6 @@
 <template>
-    <AppLayout title="Register User">
+    <AppLayout :breadcrumbs="breadcrumb">
+        <Head title="Register User"/>
         <div class="container mx-auto bg-white p-6 rounded-xl shadow">
             <h1 class="text-2xl font-bold mb-6">Register New User</h1>
 
@@ -55,7 +56,7 @@
 
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
-import { useForm, usePage } from '@inertiajs/vue3'
+import { useForm, usePage,Head } from '@inertiajs/vue3'
 import {Input} from '@/components/ui/input'
 import {Label} from '@/components/ui/label'
 import {Button} from '@/components/ui/button'
@@ -73,4 +74,8 @@ const form = useForm({
     password: '',
     role: '',
 })
+const breadcrumb =[
+    {title:'Users',href:'/users'},
+    {title:'Add Users',href:'/users/create'},
+]
 </script>

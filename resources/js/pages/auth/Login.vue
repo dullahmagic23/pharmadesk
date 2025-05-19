@@ -24,23 +24,30 @@ const submit = () => {
 };
 </script>
 <template>
-    <div class="flex h-screen">
-        <!-- Left: Form Section -->
-        <div class="w-full md:w-1/2 flex items-center justify-center px-6 bg-white">
-            <div class="w-full max-w-md space-y-8">
+    <div class="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white">
+        <!-- Header -->
+        <div class="py-8 text-center bg-blue-100 shadow-sm">
+            <img src="/assests/logo.png" alt="PharmaDesk Logo" class="h-12 mx-auto object-contain" />
+            <h1 class="mt-2 text-xl font-bold text-blue-700">PharmaDesk</h1>
+        </div>
+
+        <!-- Login Form Section -->
+        <div class="flex flex-1 items-center justify-center px-4 sm:px-6">
+            <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-md p-8 space-y-6">
+                
                 <div class="text-center">
-                    <h1 class="text-2xl font-bold text-gray-900">Welcome to PharmaDesk</h1>
-                    <p class="mt-1 text-sm text-gray-500">Enter your credentials to access your account.</p>
+                    <h2 class="text-lg font-semibold text-gray-800">Welcome Back</h2>
+                    <p class="text-sm text-gray-500">Enter your credentials to access your account</p>
                 </div>
 
                 <div v-if="status" class="text-sm text-green-600 text-center font-semibold">
                     {{ status }}
                 </div>
 
-                <form @submit.prevent="submit" class="space-y-6">
+                <form @submit.prevent="submit" class="space-y-5">
                     <!-- Email -->
                     <div>
-                        <Label for="email" class="block mb-2 text-sm font-semibold text-gray-700">Email address</Label>
+                        <Label for="email" class="block mb-1 text-sm font-medium text-gray-700">Email address</Label>
                         <div class="relative">
                             <Mail class="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                             <Input
@@ -51,7 +58,7 @@ const submit = () => {
                                 autocomplete="email"
                                 v-model="form.email"
                                 placeholder="email@example.com"
-                                class="pl-10 border-gray-300 focus:border-blue-500 transition duration-200"
+                                class="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                         <InputError :message="form.errors.email" class="mt-1" />
@@ -59,8 +66,8 @@ const submit = () => {
 
                     <!-- Password -->
                     <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <Label for="password" class="text-sm font-semibold">Password</Label>
+                        <div class="flex items-center justify-between mb-1">
+                            <Label for="password" class="text-sm font-medium text-gray-700">Password</Label>
                             <TextLink
                                 v-if="canResetPassword"
                                 :href="route('password.request')"
@@ -78,25 +85,22 @@ const submit = () => {
                                 autocomplete="current-password"
                                 v-model="form.password"
                                 placeholder="••••••••"
-                                class="pl-10 border-gray-300 focus:border-blue-500 transition duration-200"
+                                class="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                         <InputError :message="form.errors.password" class="mt-1" />
                     </div>
 
-<!--                    &lt;!&ndash; Remember Me &ndash;&gt;-->
-<!--                    <div class="flex items-center gap-2">-->
-<!--                        <Checkbox id="remember" v-model="form.remember" />-->
-<!--                        <Label for="remember" class="text-sm select-none text-gray-700 cursor-pointer">-->
-<!--                            Remember me-->
-<!--                        </Label>-->
-<!--                    </div>-->
+                    <!-- Remember Me -->
+                    <div class="flex items-center space-x-2">
+                        <Checkbox id="remember" v-model="form.remember" class="rounded" />
+                        <Label for="remember" class="text-sm text-gray-700 cursor-pointer">Remember me</Label>
+                    </div>
 
-                    <!-- Submit -->
+                    <!-- Submit Button -->
                     <Button
                         type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 transition transform hover:scale-105
-              font-semibold text-base py-3 shadow-sm rounded-lg flex items-center justify-center"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-semibold rounded-md shadow transition duration-200 ease-in-out transform hover:scale-105"
                         :disabled="form.processing"
                     >
                         <LoaderCircle v-if="form.processing" class="h-5 w-5 mr-2 animate-spin" />
@@ -105,19 +109,5 @@ const submit = () => {
                 </form>
             </div>
         </div>
-
-        <!-- Right: Branding Section -->
-        <div class="hidden md:flex w-1/2 items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200">
-            <div class="flex flex-col items-center text-center px-6">
-                <img
-                    src="/assests/logo.png"
-                    alt="PharmaDesk Logo"
-                    class="w-3/4 object-contain mb-6"
-                />
-<!--                <h2 class="text-3xl font-extrabold text-blue-700">PharmaDesk</h2></h2>-->
-                <p class="mt-2 text-base text-blue-800 font-medium">Efficient Pharmacy Management</p>
-            </div>
-        </div>
     </div>
 </template>
-

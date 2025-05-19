@@ -13,7 +13,7 @@ class DoctorFactory extends Factory
             'last_name' => $this->faker->lastName,
             'gender' => $this->faker->randomElement(['male', 'female']),
             'date_of_birth' => $this->faker->date(),
-            'specialization' => $this->faker->word,
+            'specialization' => $this->faker->word(),
             'phone' => $this->faker->phoneNumber,
             'email' => $this->faker->unique()->safeEmail,
             'address' => $this->faker->address,

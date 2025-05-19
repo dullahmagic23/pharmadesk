@@ -1,5 +1,6 @@
 <template>
-    <AppLayout title="Reports">
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <Head title="System Reports"/>
         <div class="p-6 bg-white rounded-xl shadow space-y-8">
             <h1 class="text-3xl font-extrabold text-gray-800">System Reports</h1>
 
@@ -50,6 +51,10 @@
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
 import Card from './Card.vue'
+import { Head } from '@inertiajs/vue3'
+const breadcrumbs = [
+    {title:'System Reports',href:'/reports'}
+]
 </script>
 
 <style scoped>

@@ -14,7 +14,7 @@ class Stock extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'stockable_type', 'stockable_id', 'quantity', 'retail_price', 'wholesale_price',
+        'stockable_type', 'stockable_id', 'quantity', 'unit_id','retail_price', 'wholesale_price',
     ];
 
     /**
@@ -29,4 +29,10 @@ class Stock extends Model
     {
         return $this->hasMany(StockHistory::class);
     }
+
+    public function unit()
+    {
+        return $this->hasOne(MedicineUnit::class, 'id', 'unit_id');
+    }
+
 }

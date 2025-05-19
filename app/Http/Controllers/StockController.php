@@ -18,7 +18,7 @@ class StockController extends Controller
      */
     public function index()
     {
-        $stocks = Stock::with('stockable')->latest()->get();
+        $stocks = Stock::with('stockable', 'unit')->latest()->get();
         return Inertia::render('Stocks/Index', [
             'stocks' => $stocks,
         ]);
@@ -31,7 +31,7 @@ class StockController extends Controller
     public function create()
     {
         return Inertia::render("Stocks/Create", [
-            'medicines' => Medicine::all(),
+            'medicines' => Medicine::with('units')->get(),
             'products' => Product::all(),
         ]);
     }
@@ -48,11 +48,17 @@ class StockController extends Controller
             'retail_price' => 'required|numeric|min:0',
             'wholesale_price' => 'required|numeric|min:0',
             'date' => 'nullable|date',
+            'selected_unit' => 'nullable|string|exists:medicine_units,id',
         ]);
         // Check if stock already exists
-        $stock = Stock::where('stockable_type', $validated['stockable_type'])
-            ->where('stockable_id', $validated['stockable_id'])
-            ->first();
+        $query = Stock::where('stockable_type', $validated['stockable_type'])
+            ->where('stockable_id', $validated['stockable_id']);
+
+        if ($validated['stockable_type'] === 'App\Models\Medicine') {
+            $query->where('unit_id', $validated['selected_unit']);
+        }
+
+        $stock = $query->first();
 
         if ($stock) {
             $stock->update([
@@ -61,13 +67,19 @@ class StockController extends Controller
                 'wholesale_price' => $validated['wholesale_price'],
             ]);
         } else {
-            $stock = Stock::create([
+            $stockData = [
                 'stockable_type' => $validated['stockable_type'],
                 'stockable_id' => $validated['stockable_id'],
                 'quantity' => $validated['quantity'],
                 'retail_price' => $validated['retail_price'],
                 'wholesale_price' => $validated['wholesale_price'],
-            ]);
+            ];
+
+            if ($validated['stockable_type'] === 'App\Models\Medicine') {
+                $stockData['unit_id'] = $validated['selected_unit'];
+            }
+
+            $stock = Stock::create($stockData);
         }
 
         // Record in history
@@ -95,7 +107,11 @@ class StockController extends Controller
      */
     public function edit(Stock $stock)
     {
-        //
+        return Inertia::render('Stocks/Edit', [
+            'stock' => $stock,
+            'medicines' => Medicine::with('units')->get(),
+            'products' => Product::all(),
+        ]);
     }
 
     /**
@@ -103,7 +119,33 @@ class StockController extends Controller
      */
     public function update(Request $request, Stock $stock)
     {
-        //
+        $validated = $request->validate([
+            'stockable_type' => 'required|in:App\Models\Product,App\Models\Medicine',
+            'stockable_id' => 'required|uuid',
+            'quantity' => 'required|numeric|min:0.01',
+            'retail_price' => 'required|numeric|min:0',
+            'wholesale_price' => 'required|numeric|min:0',
+            'date' => 'nullable|date',
+            'selected_unit' => 'nullable|string|exists:medicine_units,id',
+        ]);
+
+        $stock->quantity = $validated['quantity'];
+        $stock->retail_price = $validated['retail_price'];
+        $stock->wholesale_price = $validated['wholesale_price'];
+
+        if ($stock->stockable_type === 'App\Models\Medicine' && isset($validated['selected_unit'])) {
+            $stock->unit_id = $validated['selected_unit'];
+        }
+
+        $stock->save();
+
+        // Optionally record in history
+        $stock->histories()->create([
+            'quantity' => $validated['quantity'],
+            'date' => $validated['date'] ?? now()->toDateString(),
+        ]);
+
+        return redirect()->route('stocks.index')->with('success', 'Stock updated successfully.');
     }
 
     /**

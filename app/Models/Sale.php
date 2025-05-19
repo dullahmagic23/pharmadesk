@@ -11,7 +11,7 @@ class Sale extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['buyer_id','buyer_type', 'total', 'paid', 'balance','date'];
+    protected $fillable = ['buyer_id', 'buyer_type', 'total', 'paid', 'balance', 'date'];
     protected $appends = ['type'];
 
 
@@ -31,6 +31,12 @@ class Sale extends Model
     }
     public function getTypeAttribute()
     {
-        return $this->buyer_type === 'App\\Models\\Customer'?'Customer':'Patient';
+        return $this->buyer_type === 'App\\Models\\Customer' ? 'Customer' : 'Patient';
     }
+
+    public function receipt()
+    {
+        return $this->hasOne(Receipt::class);
+    }
+
 }

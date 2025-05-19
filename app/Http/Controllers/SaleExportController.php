@@ -12,7 +12,14 @@ class SaleExportController extends Controller
 {
     public function exportExcel(Request $request)
     {
-        return Excel::download(new SalesExport($request->only(['buyer_name', 'start_date', 'end_date'])), 'sales.xlsx');
+       $start_date = $request->input("start_date");
+       $end_date = $request->input("end_date");
+       if ($start_date && $end_date) {
+            $sales = Sale::with(['buyer','items'])->whereBetween("date", [$start_date, $end_date])->get();
+       } else{
+        $sales = Sale::with(["buyer","items"])->get();
+       }
+        return Excel::download(new SalesExport($sales), 'sales.xlsx');
     }
 
     public function exportPdf(Request $request)

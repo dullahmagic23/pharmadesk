@@ -5,38 +5,48 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import currency from '@/modules/currecyFormatter';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { PrinterIcon } from 'lucide-vue-next';
 
 const props = defineProps<{
     sale: {
         id: number;
         type: string;
-        buyer: {name:string};
+        buyer: { name: string };
         total: number;
         paid: number;
         balance: number;
         created_at: string;
         items: Array<{
             type: string;
-            sellable:{name:string};
+            sellable: { name: string };
             name: string;
             quantity: number;
             price: number;
         }>;
     };
 }>();
+const breadcrumbs = [
+    { title: 'Sales', href: route('sales.index') },
+    { title: `Sale #${props.sale.id}`, href: route('sales.show', props.sale.id) }
+];
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :breadcrumbs="breadcrumbs">
         <div class="container p-6">
 
             <Head title="Sale Details" />
 
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-semibold">Sale #{{ props.sale.id }}</h1>
-                <Link :href="route('sales.index')">
-                <Button variant="outline">Back to Sales</Button>
-                </Link>
+                <div class="flex justify-end space-x-6">
+                    <Link :href="route('sales.index')">
+                    <Button variant="outline">Back to Sales</Button>
+                    </Link>
+                     <Button as="a" :href="route('sales.receipt', sale.id)" variant="default">
+                        <PrinterIcon />Receipt
+                    </Button>
+                </div>
             </div>
 
             <Card class="mb-4">

@@ -22,12 +22,12 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         $this->call([
-            DosageSeeder::class
-            // UserSeeder::class,
-            // MedicineSeeder::class,
-            // MedicineUnitSeeder::class,
-            // MedicineCategorySeeder::class,
-//            ProductSeeder::class,
+            // DosageSeeder::class
+//             UserSeeder::class
+             MedicineUnitSeeder::class,
+             MedicineCategorySeeder::class,
+            ProductSeeder::class,
+            MedicineSeeder::class,
             // Add other seeders here
         ]);
     }

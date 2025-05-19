@@ -27,13 +27,15 @@ use App\Http\Controllers\SaleExportController;
 use App\Http\Controllers\SalePaymentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PurchaseReportController;
+use App\Http\Controllers\ReceiptController;
+use App\Http\Controllers\StockConversionController;
 use App\Http\Controllers\StockReportController;
 
 require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
     return Inertia::render('Dashboard');
-})->name('home')->middleware('auth');
+})->name('home')->middleware(['auth','role']);
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
@@ -50,6 +52,8 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
     Route::resource('products', ProductController::class)->middleware('auth');
     Route::resource('stocks', StockController::class)->middleware('auth');
     Route::resource('stock-histories', StockHistoryController::class)->middleware('auth');
+    Route::get('stock-conversion', [StockConversionController::class,'create'])->name('stock-conversion')->middleware('auth');
+    Route::post('stock_conversion', [StockConversionController::class,'store'])->name('stock_conversion.store')->middleware('auth');
     Route::resource('patients', PatientController::class)->middleware('auth');
     Route::resource('doctors', DoctorController::class)->middleware('auth');
     Route::resource('prescriptions', PrescriptionController::class)->middleware('auth');
@@ -81,6 +85,6 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
     Route::get('/reports/stock', [StockReportController::class, 'index'])->name('reports.stocks')->middleware('auth');
     Route::get('/reports', fn() => Inertia::render('Reports/Index'))->name('reports.index');
     Route::get('/reports/purchases/pdf', [PurchaseReportController::class, 'exportPdf'])->name('reports.purchases.pdf');
-
+    Route::get('/sales/{sale}/receipt',[ReceiptController::class,'show'])->name('sales.receipt')->middleware('auth');
 });
 

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
 
 class SaleController extends Controller
 {
@@ -27,12 +28,12 @@ class SaleController extends Controller
                     'created_at' => $sale->date,
                     'buyer_name' => $sale->buyer->name,
                     'buyer_type' => $sale->buyer_type,
-                    'items_count' => $sale->items_count,
+                    'items_count' => $sale->items->count(),
                     'total' => $sale->total,
                     'paid' => $sale->paid,
                     'balance' => $sale->total - $sale->paid,
                     'status' => $sale->paid >= $sale->total ? 'paid' :
-                               ($sale->paid > 0 ? 'partial' : 'unpaid'),
+                        ($sale->paid > 0 ? 'partial' : 'unpaid'),
                 ];
             });
 
@@ -40,77 +41,79 @@ class SaleController extends Controller
             'sales' => $sales,
         ]);
     }
-
     public function create()
     {
         return inertia('Sales/Create', [
             'customers' => Customer::select('id', 'name')->get(),
-            'patients' => Patient::all(),
-            'medicines' => Medicine::with('stock')->whereHas('stock')->select('id', 'name')->get(),
-            'products' => Product::with('stock')->whereHas('stock')->select('id', 'name')->get(),
-            'equipment' => Equipment::select('id', 'name')->get(),
+            'stocks' => Stock::with(['stockable', 'unit'])->get()
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'buyer_type' => ['required', Rule::in(['Customer', 'Patient'])],
-            'buyer_id' => 'required|uuid',
+            'customer_id' => 'required|uuid|exists:customers,id',
             'items' => 'required|array|min:1',
-            'items.*.sellable_type' => ['required', Rule::in(['Medicine', 'Product'])],
-            'items.*.sellable_id' => 'required|uuid',
+            'items.*.stock_id' => 'required|uuid|exists:stocks,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
-            'items.*.stock' => 'required|array',
             'total' => 'required|numeric|min:0',
-            'paid' => 'required|numeric|min:0',
+            'paid' => 'nullable|numeric|min:0',
             'balance' => 'required|numeric|min:0',
         ]);
 
         foreach ($validated['items'] as $item) {
-            $stock = Stock::find($item['stock']['id']);
+            $stock = Stock::find($item['stock_id']);
+            $itemName = ($stock && $stock->stockable && isset($stock->stockable->name)) ? $stock->stockable->name : 'Unknown';
             if (!$stock || $item['quantity'] > $stock->quantity) {
                 throw ValidationException::withMessages([
-                    'items' => ["The quantity for item {$item['sellable']['name']} exceeds available stock."],
+                    'items' => ["The quantity for item {$itemName} exceeds available stock."],
                 ]);
             }
         }
 
         DB::transaction(function () use ($validated) {
             $sale = Sale::create([
-                'buyer_type' => "App\\Models\\" . $validated['buyer_type'],
-                'buyer_id' => $validated['buyer_id'],
+                'buyer_type' => 'App\\Models\\Customer',
+                'buyer_id' => $validated['customer_id'],
                 'total' => $validated['total'],
                 'paid' => $validated['paid'],
                 'balance' => $validated['balance'],
-                'date' => date('Y-m-d H:i:s',now()->timestamp),
-            ]); 
+                'date' => now(),
+            ]);
+
+            $sale->receipt()->create([
+                'amount' => $validated['paid'],
+                'issued_at' => now(),
+                'issued_by' => auth()->user()?->name ?? 'System', // Or ID
+                'reference' => 'RCT-'.mt_rand(100000, 999999),
+            ]);
 
             $sale->payments()->create([
                 'amount' => $validated['paid'],
                 'paid_at' => now(),
             ]);
 
+
+
             foreach ($validated['items'] as $item) {
+                $stock = Stock::findOrFail($item['stock_id']);
+
                 $sale->items()->create([
-                    'sellable_type' => "App\\Models\\" . $item['sellable_type'],
-                    'sellable_id' => $item['sellable_id'],
+                    'sellable_type' => $stock->stockable_type,
+                    'sellable_id' => $stock->stockable_id,
                     'quantity' => $item['quantity'],
                     'subtotal' => $item['quantity'] * $item['price'],
                     'price' => $item['price'],
                 ]);
 
-                $stock = Stock::find($item['stock']['id']);
-                $stock->update([
-                    'quantity' => $stock->quantity - $item['quantity'],
-                ]);
-
+                $stock->decrement('quantity', $item['quantity']);
             }
         });
 
         return redirect()->route('sales.index')->with('success', 'Sale recorded successfully.');
     }
+
 
     public function show(Sale $sale)
     {
@@ -143,5 +146,5 @@ class SaleController extends Controller
         return back()->with('success', 'Sale deleted.');
     }
 
-   
+
 }

@@ -24,17 +24,22 @@ const form = useForm({
 function submit() {
     form.post(route('sales.payments.store', props.sale.id));
 }
+const breadcrumbs = [
+    { title: 'Sales', href: route('sales.index') },
+    { title: `Sale #${props.sale.id}`, href: route('sales.add-payments', props.sale.id) },
+    { title: 'Add Payment', href: '#' }
+];
 </script>
 
 <template>
 
-    <AppLayout>
+    <AppLayout :breadcrumbs="breadcrumbs">
 
-        <Head title="Add Payment" />
+        <Head title="Add Payment"/>
         <div class="container p-6">
 
             <div class="flex items-center justify-between mb-4">
-                <h1 class="text-2xl font-semibold">Add Payment for Sale #{{ sale.id }}</h1>
+                <h1 class="text-2xl font-semibold">Add Payment for Sale</h1>
                 <!-- <Link :href="route('sales.show', sale.id)">
             <Button variant="outline">Back to Sale</Button>
             </Link> -->

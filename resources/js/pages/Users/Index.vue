@@ -1,5 +1,6 @@
 <template>
-    <AppLayout title="Users">
+    <AppLayout :breadcrumbs="breadcrumb">
+        <Head title="Users"/>
         <div class="container mx-auto p-6 bg-white rounded-xl shadow">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold">All Users</h1>
@@ -63,7 +64,7 @@
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
 import { Button } from '@/components/ui/button'
-import { Link, router, usePage } from '@inertiajs/vue3'
+import { Link, router, usePage,Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 
 const users = usePage().props.users
@@ -101,4 +102,8 @@ function deleteUser(id) {
         router.delete(`/users/${id}`)
     }
 }
+
+const breadcrumb =[
+    {title:'Users',href:'/users'}
+]
 </script>

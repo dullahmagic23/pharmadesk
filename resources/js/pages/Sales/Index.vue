@@ -39,10 +39,14 @@ const filteredSales = computed(() => {
         return matchesBuyerName && matchesStartDate && matchesEndDate;
     });
 })
+const breadcrumbs = [
+    { title: 'Dashboard', href: route('dashboard') },
+    { title: 'Sales', href: route('sales.index') }
+];
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :breadcrumbs="breadcrumbs">
         <div class="container mx-auto p-6">
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-semibold">Sales</h1>
@@ -51,11 +55,11 @@ const filteredSales = computed(() => {
                     <Button>New Sale</Button>
                     </Link>
                     <a :href="`/sales/export/pdf?start_date=${form.start_date}&end_date=${form.end_date}`">
-                        <Button  variant="destructive">Export to pdf</Button>
+                        <Button variant="destructive">Export to pdf</Button>
                     </a>
 
-                    <a href="">
-                        <Button  variant="ghost">Export to Excel</Button>
+                    <a :href="`/sales/export/excel?start_date=${form.start_date}&end_date=${form.end_date}`">
+                        <Button variant="outline">Export to Excel</Button>
                     </a>
                 </div>
             </div>
@@ -122,6 +126,9 @@ const filteredSales = computed(() => {
                                     <Button v-if="sale.status !== 'paid'" size="sm" variant="default">Add
                                         payment</Button>
                                     </Link>
+                                    <Button as="a" :href="route('sales.receipt', sale.id)" variant="ghost">
+                                        <PrinterIcon />Receipt
+                                    </Button>
                                 </div>
                             </td>
                         </tr>

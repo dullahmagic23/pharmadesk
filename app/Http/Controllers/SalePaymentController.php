@@ -31,6 +31,7 @@ class SalePaymentController extends Controller
             ]);
 
             // Update the sale's paid and balance fields
+        $sale->refresh();
             $sale->paid += $validated['amount'];
             $sale->balance = $sale->total - $sale->paid;
             $sale->save();

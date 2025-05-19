@@ -10,11 +10,13 @@ use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Services\MedicineCacheService;
 
 class MedicineController extends Controller
 {
-    public function index()
+    public function index(MedicineCacheService $cacheService)
     {
+        $medicines = $cacheService->all();
         $medicines = Medicine::with([
             'category' => function ($query) {
                 $query->select('id', 'name');
@@ -37,7 +39,7 @@ class MedicineController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request,MedicineCacheService $cacheService)
     {
         // dd($request->all());
         $validated = $request->validate([
@@ -65,6 +67,8 @@ class MedicineController extends Controller
             $unitIds = collect($validated['units'])->pluck('medicine_unit_id')->toArray();
             $medicine->units()->sync($unitIds); // assuming belongsToMany
         });
+        $cacheService->clear();
+        $cacheService->all();
         return redirect()->back()->with('success', 'Medicine created successfully.');
     }
 
@@ -86,7 +90,7 @@ class MedicineController extends Controller
         ]);
     }
 
-    public function update(Request $request, Medicine $medicine)
+    public function update(Request $request, Medicine $medicine, MedicineCacheService $cacheService)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -103,13 +107,13 @@ class MedicineController extends Controller
         ]);
 
         $medicine->units()->sync($data['unit_ids'] ?? []);
-
+        $cacheService->clear();
         return redirect()->route('medicines.index')->with('success', 'Medicine updated successfully.');
     }
-    public function destroy(Medicine $medicine)
+    public function destroy(Medicine $medicine, MedicineCacheService $cacheService)
     {
         $medicine->delete();
-
+        $cacheService->clear();
         return redirect()->route('medicines.index')->with('success', 'Medicine deleted successfully.');
     }
 }

@@ -17,7 +17,8 @@ import {
     UserPlus,
     UserSquare2Icon,
     Users2,
-    FileImageIcon
+    FileImageIcon,
+    Recycle
 } from 'lucide-vue-next';
 
 import {
@@ -51,6 +52,7 @@ const medicalItems = [
             { title: 'Manage Stock', href: '/stocks', icon: Settings2Icon },
             { title: 'Stock History', href: '/stock-histories', icon: ListPlusIcon },
             { title: 'Stock Categories', href: '/medicine-categories', icon: ListCollapse },
+            { title: 'Stock Conversion', href: '/stock-conversion', icon: Recycle },
         ],
     },
 

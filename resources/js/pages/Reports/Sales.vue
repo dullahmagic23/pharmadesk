@@ -1,15 +1,11 @@
 <template>
-    <AppLayout  :breadcrumbs="breadcrumbs">
-        <Head title="Sales Report"/>
+    <AppLayout :breadcrumbs="breadcrumbs">
+
+        <Head title="Sales Report" />
         <div class="p-6 bg-white rounded-xl shadow space-y-6">
             <div class="flex justify-end space-x-4">
-                <form @submit.prevent="getReport()" class="flex w-full items-center space-x-4">
-                    <Input v-model="filters.from" type="date" placeholder="From" />
-                    <Input v-model="filters.to" type="date" placeholder="To" />
-                    <Button type="submit">
-                        <SearchIcon class="w-5 h-5" />
-                        Filter</Button>
-                </form>
+                <Input v-model="filters.from" type="date" placeholder="From" />
+                <Input v-model="filters.to" type="date" placeholder="To" />
                 <Button variant="destructive" @click="clearFilters">
                     <DeleteIcon class="w-5 h-5" />
                     Clear filters
@@ -17,8 +13,9 @@
             </div>
             <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div class="text-lg font-semibold text-gray-700">
-                    Total Sales: 
-                    <span class="text-green-600">{{ currency(flattenedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)) }}</span>
+                    Total Sales:
+                    <span class="text-green-600">{{currency(flattenedItems.reduce((sum, item) => sum + (item.price *
+                        item.quantity), 0)) }}</span>
                 </div>
                 <div class="flex flex-wrap justify-center md:justify-end space-x-2">
                     <Button @click="exportToCSV" variant="outline" class="flex items-center space-x-2">
@@ -68,37 +65,50 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ref, computed } from 'vue'
-import { router, useForm, usePage, Head } from '@inertiajs/vue3'
+import { usePage, Head } from '@inertiajs/vue3'
 import currency from '@/modules/currecyFormatter'
-import axios from 'axios'
-import { DeleteIcon, SearchIcon, DownloadIcon, FileTextIcon } from 'lucide-vue-next'
+import { DeleteIcon, DownloadIcon, FileTextIcon } from 'lucide-vue-next'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-
 
 const page = usePage()
 const sales = ref(page.props.sales || [])
 const filters = ref({ ...page.props.filters })
 
-
-const form = useForm({});
-
-function getReport() {
-    if (filters.value.from && filters.value.to) {
-        const fromDate = new Date(filters.value.from);
-        const toDate = new Date(filters.value.to);
-
-        sales.value = page.props.sales.filter(sale => {
-            const saleDate = new Date(sale.created_at);
-            return saleDate >= fromDate && saleDate <= new Date(toDate.setHours(23, 59, 59, 999));
-        });
-    }
-}
-
 function clearFilters() {
-    filters.value = { from: '', to: '' };
-    sales.value = page.props.sales || [];
+    filters.value = { from: '', to: '' }
 }
+
+// Filtered sales computed property
+const filteredSales = computed(() => {
+    if (!filters.value.from && !filters.value.to) return sales.value
+    return sales.value.filter(sale => {
+        const saleDate = new Date(sale.created_at)
+        let fromOk = true
+        let toOk = true
+        if (filters.value.from) {
+            const fromDate = new Date(filters.value.from)
+            fromDate.setHours(0, 0, 0, 0)
+            fromOk = saleDate >= fromDate
+        }
+        if (filters.value.to) {
+            const toDate = new Date(filters.value.to)
+            toDate.setHours(23, 59, 59, 999)
+            toOk = saleDate <= toDate
+        }
+        return fromOk && toOk
+    })
+})
+
+// Flatten sale items for display
+const flattenedItems = computed(() =>
+    filteredSales.value.flatMap(sale =>
+        (sale.items || []).map(item => ({
+            ...item,
+            created_at: sale.created_at
+        }))
+    )
+)
 
 function readableType(type) {
     return type?.split('\\').pop() || 'Unknown'
@@ -107,23 +117,6 @@ function readableType(type) {
 function formatDate(dateStr) {
     return new Date(dateStr).toLocaleDateString()
 }
-
-// Flatten sale items for display
-const flattenedItems = computed(() =>
-    sales.value.flatMap(sale =>
-        (sale.items || []).map(item => ({
-            ...item,
-            created_at: sale.created_at
-        }))
-    )
-)
-
-const breadcrumbs = [
-    {title:'Reports',href:'/reports'},
-    {title:'Sales Report',href:'/reports/sales'},
-]
-
-
 
 function exportToCSV() {
     const headers = ['#', 'Item', 'Type', 'Quantity', 'Price', 'Total', 'Date']
@@ -136,11 +129,9 @@ function exportToCSV() {
         currency(item.price * item.quantity),
         formatDate(item.created_at)
     ])
-
     const csvContent = [headers, ...rows]
         .map(row => row.map(cell => `"${cell}"`).join(','))
         .join('\n')
-
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -163,7 +154,6 @@ function exportToPDF() {
         currency(item.price * item.quantity),
         formatDate(item.created_at)
     ])
-
     autoTable(doc, {
         head: headers,
         body: rows,
@@ -171,7 +161,11 @@ function exportToPDF() {
         styles: { fontSize: 8 },
         headStyles: { fillColor: [22, 160, 133] }
     })
-
     doc.save('sales_report.pdf')
 }
+
+const breadcrumbs = [
+    { title: 'Reports', href: '/reports' },
+    { title: 'Sales Report', href: '/reports/sales' },
+]
 </script>
