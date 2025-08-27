@@ -30,6 +30,7 @@ use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\StockConversionController;
 use App\Http\Controllers\StockReportController;
+use App\Http\Controllers\RoleController;
 
 require __DIR__ . '/auth.php';
 
@@ -86,5 +87,6 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
     Route::get('/reports', fn() => Inertia::render('Reports/Index'))->name('reports.index');
     Route::get('/reports/purchases/pdf', [PurchaseReportController::class, 'exportPdf'])->name('reports.purchases.pdf');
     Route::get('/sales/{sale}/receipt',[ReceiptController::class,'show'])->name('sales.receipt')->middleware('auth');
+    Route::resource('roles', RoleController::class);
 });
 

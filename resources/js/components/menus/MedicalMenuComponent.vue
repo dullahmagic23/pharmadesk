@@ -12,21 +12,22 @@ import {
     ChevronRightCircle,
     StoreIcon,
     ListPlusIcon,
-    Settings2Icon, HeartIcon, UsersRoundIcon, CircleDollarSignIcon,
+    Settings2Icon,
+    HeartIcon,
+    UsersRoundIcon,
+    CircleDollarSignIcon,
     Users2Icon,
     UserPlus,
     UserSquare2Icon,
     Users2,
     FileImageIcon,
-    Recycle
+    Recycle,
+    UsersIcon,
+    UserPlus2Icon,
+    PlusSquare,
 } from 'lucide-vue-next';
 
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup } from '@/components/ui/dropdown-menu';
 
 import { SidebarMenuButton } from '@/components/ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -83,7 +84,7 @@ const medicalItems = [
         ],
     },
     {
-        title:  'People',
+        title: 'People',
         icon: UsersRound,
         children: [
             {
@@ -110,7 +111,23 @@ const medicalItems = [
                     { title: 'Manage Doctors', href: '/doctors', icon: ListFilter },
                 ],
             },
-        ]
+            {
+                title: 'Users',
+                icon: UserSquare2Icon,
+                children: [
+                    { title: 'New User', href: '/users/create', icon: UserPlus },
+                    { title: 'Manage Users', href: '/users', icon: UsersIcon },
+                    {
+                        title: 'User Roles',
+                        icon: UserPlus2Icon,
+                        children: [
+                            { title: 'New Role', href: '/roles/create', icon: PlusSquare },
+                            {title: 'Manage Roles', href:'/roles', icon: ListPlusIcon}
+                        ],
+                    },
+                ],
+            },
+        ],
     },
     {
         title: 'Accounting',
@@ -168,8 +185,8 @@ const medicalItems = [
                 children: [
                     { title: 'New Bill', href: '/bills/create', icon: PlusCircleIcon },
                     { title: 'Manage Bills', href: '/bills', icon: ListFilter },
-                    {title: 'Bill Payment', href: '/bill-payments/create', icon: ListFilter},
-                    {title: 'Payment History', href: '/bill-payments', icon: ListFilter},
+                    { title: 'Bill Payment', href: '/bill-payments/create', icon: ListFilter },
+                    { title: 'Payment History', href: '/bill-payments', icon: ListFilter },
                 ],
             },
             {
@@ -180,7 +197,7 @@ const medicalItems = [
                     { title: 'New Purchase Order', href: '/purchases/create', icon: PlusCircleIcon },
                     { title: 'Manage Purchase Orders', href: '/purchases', icon: ListFilter },
                 ],
-            }
+            },
         ],
     },
     {
@@ -204,21 +221,21 @@ const medicalItems = [
         title: 'Users',
         icon: Users2Icon,
         children: [
-            {title:'Add users',href:'/users/create', icon:UserPlus},
-            {title:'Manage users',href:'/users', icon:UserSquare2Icon},
-            {title:'User Logs',href:'/users/activity-logs', icon:Users2},
+            { title: 'Add users', href: '/users/create', icon: UserPlus },
+            { title: 'Manage users', href: '/users', icon: UserSquare2Icon },
+            { title: 'User Logs', href: '/users/activity-logs', icon: Users2 },
         ],
     },
     {
         title: 'Reports',
         icon: ChartBar,
         children: [
-            {title: 'Sales Report',href:'/reports/sales',icon: FileImageIcon},
-            {title: 'Customers Report',href:'/reports/sales',icon: FileImageIcon},
-            {title: 'Inventory Report',href:'/reports/sales',icon: FileImageIcon},
-            {title: 'Stock Report',href:'/reports/sales',icon: FileImageIcon},
-            {title: 'Purchase Report',href:'/reports/sales',icon: FileImageIcon},
-            {title: 'Profit & Loss Report',href:'/reports/sales',icon: FileImageIcon},
+            { title: 'Sales Report', href: '/reports/sales', icon: FileImageIcon },
+            { title: 'Customers Report', href: '/reports/sales', icon: FileImageIcon },
+            { title: 'Inventory Report', href: '/reports/sales', icon: FileImageIcon },
+            { title: 'Stock Report', href: '/reports/sales', icon: FileImageIcon },
+            { title: 'Purchase Report', href: '/reports/sales', icon: FileImageIcon },
+            { title: 'Profit & Loss Report', href: '/reports/sales', icon: FileImageIcon },
         ],
     },
 ];
@@ -228,10 +245,7 @@ const medicalItems = [
     <div class="space-y-2">
         <DropdownMenu v-for="item in medicalItems" :key="item.title">
             <DropdownMenuTrigger as-child>
-                <SidebarMenuButton
-                    size="lg"
-                    class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
+                <SidebarMenuButton size="lg" class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                     <component :is="item.icon" />
                     {{ item.title }}
                     <ChevronRightCircle class="ml-auto size-4" />
@@ -245,14 +259,9 @@ const medicalItems = [
             >
                 <DropdownMenuGroup>
                     <!-- Recursively render children -->
-                    <SidebarDropdownMenuItem
-                        v-for="child in item.children"
-                        :key="child.href || child.title"
-                        :item="child"
-                    />
+                    <SidebarDropdownMenuItem v-for="child in item.children" :key="child.href || child.title" :item="child" />
                 </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>
     </div>
 </template>
-
