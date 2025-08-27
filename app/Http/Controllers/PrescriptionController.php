@@ -29,9 +29,9 @@ class PrescriptionController extends Controller
     {
         $patients = Patient::all();
         $doctors = Doctor::all();
-        $medicines = Medicine::all();
+        $medicines = Medicine::whereHas('stocks')->get();
         $dosages = Dosage::all();
-        $isDoctor = Auth::user()->hasRole('doctor');
+        $isDoctor = auth()->user()->hasRole('doctor');
 
         return Inertia::render('Prescriptions/Create', [
             'patients' => $patients,

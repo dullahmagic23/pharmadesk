@@ -59,6 +59,9 @@ class StockConversionController extends Controller
                 $stock->quantity += $converted;
                 $stock->retail_price = $validated['retail_price'];
                 $stock->wholesale_price = $validated['wholesale_price'];
+                $stock->expiration_date = $affected_stock->expiration_date;
+                $stock->batch_number = $affected_stock->batch_number;
+                $stock->location_id = $affected_stock->location_id;
                 $stock->save();
             } else {
                 $stock = Stock::create([

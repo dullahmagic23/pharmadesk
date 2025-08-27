@@ -60,7 +60,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { Link, router } from '@inertiajs/vue3'
 import {Pagination} from '@/components/ui/pagination'
 import {DeleteIcon,EyeIcon} from 'lucide-vue-next';
-import { Button } from '@/components/ui/button/index.js';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const props = defineProps({

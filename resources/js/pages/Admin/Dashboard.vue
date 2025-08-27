@@ -14,22 +14,22 @@
 
             <!-- Stats Section -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                <Card 
-                    title="Total Doctors" 
-                    :value="stats.doctors" 
-                    icon="stethoscope" 
+                <Card
+                    title="Total Doctors"
+                    :value="stats.doctors"
+                    icon="stethoscope"
                     class="bg-blue-800 text-blue-100 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                 />
-                <Card 
-                    title="Total Pharmacists" 
-                    :value="stats.pharmacists" 
-                    icon="pill" 
+                <Card
+                    title="Total Pharmacists"
+                    :value="stats.pharmacists"
+                    icon="pill"
                     class="bg-green-800 text-green-100 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                 />
-                <Card 
-                    title="Total Patients" 
-                    :value="stats.patients" 
-                    icon="users" 
+                <Card
+                    title="Total Patients"
+                    :value="stats.patients"
+                    icon="users"
                     class="bg-yellow-800 text-yellow-100 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                 />
             </div>
@@ -38,9 +38,9 @@
             <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 shadow-md mb-6">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-4">Quick Access</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                    <Link 
-                        v-for="link in quickLinks" 
-                        :key="link.title" 
+                    <Link
+                        v-for="link in quickLinks"
+                        :key="link.title"
                         :href="link.href"
                         class="flex flex-col items-center justify-center px-4 py-6 rounded-lg bg-white hover:bg-blue-50 text-gray-700 font-medium shadow-md hover:shadow-lg transition-all duration-300"
                     >
@@ -54,9 +54,9 @@
             <div class="bg-white rounded-2xl p-6 shadow-md">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
                 <ul class="text-gray-700 space-y-2">
-                    <li 
-                        v-for="(item, index) in activity" 
-                        :key="index" 
+                    <li
+                        v-for="(item, index) in activity"
+                        :key="index"
                         class="flex items-center space-x-2"
                     >
                         <span class="text-blue-500 font-medium">•</span>

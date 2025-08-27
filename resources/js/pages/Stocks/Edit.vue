@@ -84,6 +84,48 @@
                     <InputError :message="form.errors.wholesale_price" />
                 </div>
 
+                <!-- Status -->
+                <div>
+                    <Label for="status">Status</Label>
+                    <Select v-model="form.status" class="w-full">
+                        <SelectTrigger class="w-full">
+                            <SelectValue placeholder="Select Status" />
+                        </SelectTrigger>
+                        <SelectContent class="w-full">
+                            <SelectGroup>
+                                <SelectLabel>Statuses</SelectLabel>
+                                <SelectItem value="available">Available</SelectItem>
+                                <SelectItem value="reserved">Reserved</SelectItem>
+                                <SelectItem value="expired">Expired</SelectItem>
+                                <SelectItem value="damaged">Damaged</SelectItem>
+                                <SelectItem value="returned">Returned</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="form.errors.status" />
+                </div>
+
+                <!-- Expiration Date -->
+                <div>
+                    <Label for="expiration_date">Expiration Date</Label>
+                    <Input id="expiration_date" v-model="form.expiration_date" type="date" />
+                    <InputError :message="form.errors.expiration_date" />
+                </div>
+
+                <!-- Batch Number -->
+                <div>
+                    <Label for="batch_number">Batch Number</Label>
+                    <Input id="batch_number" v-model="form.batch_number" type="text" />
+                    <InputError :message="form.errors.batch_number" />
+                </div>
+
+                <!-- Location ID -->
+                <div>
+                    <Label for="location_id">Location ID</Label>
+                    <Input id="location_id" v-model="form.location_id" type="text" />
+                    <InputError :message="form.errors.location_id" />
+                </div>
+
                 <!-- Date -->
                 <div>
                     <Label for="date">Date</Label>
@@ -127,6 +169,7 @@ const form = useForm({
     wholesale_price: props.stock.wholesale_price,
     date: props.stock.date,
     selected_unit: props.stock.unit_id,
+    status: props.stock.status,
 });
 
 const selectedMedicineUnits = computed(() => {

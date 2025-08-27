@@ -2,7 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Button } from '@/components/ui/button/index.js';
+import { Button } from '@/components/ui/button';
 
 defineProps({
     equipment: Array,

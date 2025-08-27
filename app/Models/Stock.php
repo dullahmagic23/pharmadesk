@@ -14,7 +14,16 @@ class Stock extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'stockable_type', 'stockable_id', 'quantity', 'unit_id','retail_price', 'wholesale_price',
+        'stockable_type',
+        'stockable_id',
+        'quantity',
+        'unit_id',
+        'retail_price',
+        'wholesale_price',
+        'expiration_date',
+        'status',
+        'location_id',
+        'batch_number'
     ];
 
     /**

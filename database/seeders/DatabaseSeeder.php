@@ -14,18 +14,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-//        Doctor::factory(10)->create();
+        //        Doctor::factory(10)->create();
         // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        User::factory()->create([
+            'name' => 'Abdilah Ramadhani',
+            'email' => 'abdi@pharmadesk.test',
+            'password' => bcrypt('password'),
+        ]);
         $this->call([
-            // DosageSeeder::class
-//             UserSeeder::class
-             MedicineUnitSeeder::class,
-             MedicineCategorySeeder::class,
+            DosageSeeder::class,
+            // UserSeeder::class,
+            MedicineUnitSeeder::class,
+            MedicineCategorySeeder::class,
             ProductSeeder::class,
             MedicineSeeder::class,
             // Add other seeders here

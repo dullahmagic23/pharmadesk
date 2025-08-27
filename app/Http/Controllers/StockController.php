@@ -49,6 +49,10 @@ class StockController extends Controller
             'wholesale_price' => 'required|numeric|min:0',
             'date' => 'nullable|date',
             'selected_unit' => 'nullable|string|exists:medicine_units,id',
+            'status' => 'required|string',
+            'expiration_date' => 'nullable|date',
+            'batch_number' => 'nullable|string',
+            'location_id' => 'nullable|string',
         ]);
         // Check if stock already exists
         $query = Stock::where('stockable_type', $validated['stockable_type'])
@@ -60,11 +64,17 @@ class StockController extends Controller
 
         $stock = $query->first();
 
+        $userId = auth()->id();
         if ($stock) {
             $stock->update([
                 'quantity' => $stock->quantity + $validated['quantity'],
-                'retail_price' => $validated['retail_price'], // Optional: update pricing
+                'retail_price' => $validated['retail_price'],
                 'wholesale_price' => $validated['wholesale_price'],
+                'status' => $validated['status'],
+                'expiration_date' => $validated['expiration_date'] ?? null,
+                'batch_number' => $validated['batch_number'] ?? null,
+                'location_id' => $validated['location_id'] ?? null,
+                'updated_by' => $userId,
             ]);
         } else {
             $stockData = [
@@ -73,12 +83,16 @@ class StockController extends Controller
                 'quantity' => $validated['quantity'],
                 'retail_price' => $validated['retail_price'],
                 'wholesale_price' => $validated['wholesale_price'],
+                'status' => $validated['status'],
+                'expiration_date' => $validated['expiration_date'] ?? null,
+                'batch_number' => $validated['batch_number'] ?? null,
+                'location_id' => $validated['location_id'] ?? null,
+                'created_by' => $userId,
+                'updated_by' => $userId,
             ];
-
             if ($validated['stockable_type'] === 'App\Models\Medicine') {
                 $stockData['unit_id'] = $validated['selected_unit'];
             }
-
             $stock = Stock::create($stockData);
         }
 
@@ -127,11 +141,25 @@ class StockController extends Controller
             'wholesale_price' => 'required|numeric|min:0',
             'date' => 'nullable|date',
             'selected_unit' => 'nullable|string|exists:medicine_units,id',
+            'status' => 'required|string',
+            'expiration_date' => 'nullable|date',
+            'batch_number' => 'nullable|string',
+            'location_id' => 'nullable|uuid',
         ]);
 
+        $userId = auth()->id();
         $stock->quantity = $validated['quantity'];
         $stock->retail_price = $validated['retail_price'];
         $stock->wholesale_price = $validated['wholesale_price'];
+        $stock->status = $validated['status'];
+        $stock->expiration_date = $validated['expiration_date'] ?? null;
+        $stock->batch_number = $validated['batch_number'] ?? null;
+        $stock->location_id = $validated['location_id'] ?? null;
+        $stock->updated_by = $userId;
+        $stock->expiration_date = $validated['expiration_date'] ?? null;
+        $stock->batch_number = $validated['batch_number'] ?? null;
+        $stock->location_id = $validated['location_id'] ?? null;
+
 
         if ($stock->stockable_type === 'App\Models\Medicine' && isset($validated['selected_unit'])) {
             $stock->unit_id = $validated['selected_unit'];

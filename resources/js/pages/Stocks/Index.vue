@@ -20,39 +20,53 @@
             </div>
 
             <div class="overflow-x-auto rounded bg-white shadow">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Item</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Unit</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Quantity</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Retail Price</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Wholesale Price</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Last Updated</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        <tr v-for="stock in filteredStocks" :key="stock.id">
-                            <td class="px-6 py-4 whitespace-nowrap">{{ stock.stockable?.name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                {{ stock.stockable_type.includes('Product') ? 'Product' : 'Medicine' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ stock.unit?.unit_name || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ formatQuantity(stock.quantity) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ currency(stock.retail_price) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ currency(stock.wholesale_price) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ formatDate(stock.updated_at) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <Link :href="route('stocks.edit',stock.id)" class="flex">
-                                    <PencilIcon class="w-4 h-4 mr-2"/>
-                                    Edit
-                                </Link>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div style="width: 100%; overflow-x: auto;">
+                    <table class="w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Item</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Type</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Unit</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Quantity</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Retail Price</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Wholesale Price</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Status</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Expiration Date</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Batch Number</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Location ID</th>
+                                <!-- <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Created By</th> -->
+                                <!-- <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Updated By</th>
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Last Updated</th> -->
+                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            <tr v-for="stock in filteredStocks" :key="stock.id">
+                                <td class="whitespace-nowrap">{{ stock.stockable?.name }}</td>
+                                <td class="whitespace-nowrap">
+                                    {{ stock.stockable_type.includes('Product') ? 'Product' : 'Medicine' }}
+                                </td>
+                                <td class="whitespace-nowrap">{{ stock.unit?.unit_name || '-' }}</td>
+                                <td class="whitespace-nowrap">{{ formatQuantity(stock.quantity) }}</td>
+                                <td class="whitespace-nowrap">{{ currency(stock.retail_price) }}</td>
+                                <td class="whitespace-nowrap">{{ currency(stock.wholesale_price) }}</td>
+                                <td class="whitespace-nowrap">{{ stock.status }}</td>
+                                <td class="whitespace-nowrap">{{ stock.expiration_date ? formatDate(stock.expiration_date) : '-' }}</td>
+                                <td class="whitespace-nowrap">{{ stock.batch_number || '-' }}</td>
+                                <td class="whitespace-nowrap">{{ stock.location_id || '-' }}</td>
+                                <!-- <td class="whitespace-nowrap">{{ stock.created_by || '-' }}</td> -->
+                                <!-- <td class="whitespace-nowrap">{{ stock.updated_by || '-' }}</td>
+                                <td class="whitespace-nowrap">{{ formatDate(stock.updated_at) }}</td> -->
+                                <td class="whitespace-nowrap">
+                                    <Link :href="route('stocks.edit',stock.id)" class="flex">
+                                        <PencilIcon class="w-4 h-4 mr-2"/>
+                                        Edit
+                                    </Link>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </AppLayout>
@@ -66,26 +80,42 @@ import { PencilIcon, PlusCircleIcon } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 
 // Props
-const props = defineProps({
-    stocks: Object,
-});
+interface Stock {
+    id: string;
+    stockable?: { name: string };
+    stockable_type: string;
+    unit?: { unit_name: string };
+    quantity: number;
+    retail_price: number;
+    wholesale_price: number;
+    status: string;
+    expiration_date?: string;
+    batch_number?: string;
+    location_id?: string;
+    created_by?: string;
+    updated_by?: string;
+    updated_at: string;
+}
+
+const props = defineProps<{ stocks: Stock[] }>();
 
 const searchQuery = ref('');
 const selectedType = ref('');
 
 const filteredStocks = computed(() => {
-    return props.stocks.filter((stock: object) => {
-        const matchesSearch = stock.stockable?.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+    if (!props.stocks) return [];
+    return props.stocks.filter((stock) => {
+        const matchesSearch = stock.stockable?.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ?? false;
         const matchesType = !selectedType.value || stock.stockable_type.includes(selectedType.value);
         return matchesSearch && matchesType;
     });
 });
 
-const formatQuantity = (quantity: number): string => {
+const formatQuantity = (quantity: number): number => {
     return Math.trunc(quantity);
 };
 
-const formatDate = (date) => new Date(date).toLocaleDateString();
+const formatDate = (date: string): string => new Date(date).toLocaleDateString();
 
 const breadcrumbs = [{ title: 'All Stocks', href: '/stocks' }];
 </script>

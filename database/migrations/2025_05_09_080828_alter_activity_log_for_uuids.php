@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('activity_log', function (Blueprint $table) {
-            $table->dropColumn(['causer_id', 'subject_id']);
-        });
+        // Schema::table('activity_log', function (Blueprint $table) {
+        //     $table->dropColumn(['causer_id', 'subject_id']);
+        // });
 
-        Schema::table('activity_log', function (Blueprint $table) {
-            $table->uuid('causer_id')->nullable()->after('id');
-            $table->uuid('subject_id')->nullable()->after('causer_type');
-        });
+        // Schema::table('activity_log', function (Blueprint $table) {
+        //     $table->uuid('causer_id')->nullable()->after('id');
+        //     $table->uuid('subject_id')->nullable()->after('causer_type');
+        // });
     }
 
     public function down(): void
