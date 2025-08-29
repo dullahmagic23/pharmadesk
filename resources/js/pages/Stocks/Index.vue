@@ -2,68 +2,101 @@
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Stocks" />
 
-        <div class="p-6">
-            <div class="mb-6 flex items-center justify-between">
-                <h1 class="text-2xl font-semibold">Stock List</h1>
-                <div class="flex items-center gap-4">
-                    <input type="text" v-model="searchQuery" placeholder="Search stocks..." class="rounded border px-4 py-2" />
-                    <select v-model="selectedType" class="rounded border px-4 py-2">
+        <div class="container mx-auto px-4 py-8">
+            <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Stock Inventory</h1>
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+                    <div class="relative flex-grow">
+                        <input
+                            type="text"
+                            v-model="searchQuery"
+                            placeholder="Search by item name..."
+                            class="w-full pl-10 pr-4 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                        />
+                        <SearchIcon class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    </div>
+                    <select
+                        v-model="selectedType"
+                        class="w-full md:w-auto px-4 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-blue-500 transition-colors bg-white appearance-none pr-8"
+                    >
                         <option value="">All Types</option>
                         <option value="Product">Product</option>
                         <option value="Medicine">Medicine</option>
                     </select>
-                    <Link :href="route('stocks.create')" class="flex rounded bg-gray-900 px-2 py-2 text-white">
-                        <PlusCircleIcon class="mr-2" />
-                        Add Stock
+                    <Link :href="route('stocks.create')" class="w-full md:w-auto flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white font-medium transition-colors">
+                        <PlusCircleIcon class="mr-2 h-5 w-5" />
+                        Add New Stock
                     </Link>
                 </div>
             </div>
 
-            <div class="overflow-x-auto rounded bg-white shadow">
-                <div style="width: 100%; overflow-x: auto;">
-                    <table class="w-full divide-y divide-gray-200">
+            <div class="bg-white rounded-xl shadow-lg border overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full divide-y divide-gray-200 min-w-[1200px]">
                         <thead class="bg-gray-50">
-                            <tr>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Item</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Type</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Unit</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Quantity</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Retail Price</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Wholesale Price</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Status</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Expiration Date</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Batch Number</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Location ID</th>
-                                <!-- <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Created By</th> -->
-                                <!-- <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Updated By</th>
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Last Updated</th> -->
-                                <th class="text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Actions</th>
-                            </tr>
+                        <tr>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Item</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Type</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Quantity</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Retail Price</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Wholesale Price</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Status</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Expiration Date</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Batch Number</th>
+                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Actions</th>
+                        </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
-                            <tr v-for="stock in filteredStocks" :key="stock.id">
-                                <td class="whitespace-nowrap">{{ stock.stockable?.name }}</td>
-                                <td class="whitespace-nowrap">
-                                    {{ stock.stockable_type.includes('Product') ? 'Product' : 'Medicine' }}
-                                </td>
-                                <td class="whitespace-nowrap">{{ stock.unit?.unit_name || '-' }}</td>
-                                <td class="whitespace-nowrap">{{ formatQuantity(stock.quantity) }}</td>
-                                <td class="whitespace-nowrap">{{ currency(stock.retail_price) }}</td>
-                                <td class="whitespace-nowrap">{{ currency(stock.wholesale_price) }}</td>
-                                <td class="whitespace-nowrap">{{ stock.status }}</td>
-                                <td class="whitespace-nowrap">{{ stock.expiration_date ? formatDate(stock.expiration_date) : '-' }}</td>
-                                <td class="whitespace-nowrap">{{ stock.batch_number || '-' }}</td>
-                                <td class="whitespace-nowrap">{{ stock.location_id || '-' }}</td>
-                                <!-- <td class="whitespace-nowrap">{{ stock.created_by || '-' }}</td> -->
-                                <!-- <td class="whitespace-nowrap">{{ stock.updated_by || '-' }}</td>
-                                <td class="whitespace-nowrap">{{ formatDate(stock.updated_at) }}</td> -->
-                                <td class="whitespace-nowrap">
-                                    <Link :href="route('stocks.edit',stock.id)" class="flex">
-                                        <PencilIcon class="w-4 h-4 mr-2"/>
-                                        Edit
+                        <tr v-for="stock in filteredStocks" :key="stock.id" class="hover:bg-gray-50 transition-colors">
+                            <td class="py-4 px-6 font-medium text-gray-800">{{ stock.stockable?.name }}</td>
+                            <td class="py-4 px-6 text-gray-600">
+                                {{ stock.stockable_type.includes('Product') ? 'Product' : 'Medicine' }}
+                            </td>
+                            <td class="py-4 px-6">
+                                    <span :class="[
+                                        'px-2 py-1 rounded-full text-xs font-semibold',
+                                        {'bg-red-100 text-red-800': isLow(stock)},
+                                        {'bg-green-100 text-green-800': !isLow(stock)}
+                                    ]">
+                                        {{ formatQuantity(stock.quantity) }} {{ stock.unit?.unit_name || '' }}
+                                    </span>
+                            </td>
+                            <td class="py-4 px-6 font-mono">{{ currency(stock.retail_price) }}</td>
+                            <td class="py-4 px-6 font-mono">{{ currency(stock.wholesale_price) }}</td>
+                            <td class="py-4 px-6">
+                                    <span :class="[
+                                        'px-3 py-1 rounded-full text-xs font-semibold',
+                                        {'bg-red-100 text-red-800': stock.status === 'Expired'},
+                                        {'bg-yellow-100 text-yellow-800': stock.status === 'Expiring Soon'},
+                                        {'bg-green-100 text-green-800': stock.status === 'In Stock'},
+                                    ]">
+                                        {{ stock.status }}
+                                    </span>
+                            </td>
+                            <td class="py-4 px-6">{{ stock.expiration_date ? formatDate(stock.expiration_date) : '-' }}</td>
+                            <td class="py-4 px-6">{{ stock.batch_number || '-' }}</td>
+                            <td class="py-4 px-6">
+                                <div class="flex items-center space-x-2">
+                                    <Link :href="route('stocks.edit', stock.id)">
+                                        <Button variant="ghost" size="icon" class="text-gray-500 hover:text-blue-600">
+                                            <PencilIcon class="h-5 w-5" />
+                                        </Button>
                                     </Link>
-                                </td>
-                            </tr>
+                                    <Button
+                                        v-if="checkIfExpired(stock)"
+                                        variant="ghost"
+                                        size="icon"
+                                        class="text-red-500 hover:bg-red-50 hover:text-red-600"
+                                        @click="confirmExpire(stock)"
+                                    >
+                                        <AlertCircleIcon class="h-5 w-5" />
+                                    </Button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="filteredStocks.length === 0">
+                            <td colspan="9" class="py-12 text-center text-gray-500 italic">No stocks found.</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -76,8 +109,10 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import currency from '@/modules/currecyFormatter';
-import { PencilIcon, PlusCircleIcon } from 'lucide-vue-next';
+import { PencilIcon, PlusCircleIcon, SearchIcon, AlertCircleIcon } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
+import { router } from '@inertiajs/vue3'
+import { Button } from '@/components/ui/button';
 
 // Props
 interface Stock {
@@ -111,11 +146,30 @@ const filteredStocks = computed(() => {
     });
 });
 
-const formatQuantity = (quantity: number): number => {
-    return Math.trunc(quantity);
+const confirmExpire = (stock: Stock) => {
+    if (confirm(`Are you sure you want to mark this stock as expired? This action cannot be undone.`)) {
+        router.patch(route('stocks.expire', stock.id))
+    }
+}
+
+const formatQuantity = (quantity: number): string => {
+    return Math.trunc(quantity).toLocaleString();
 };
 
-const formatDate = (date: string): string => new Date(date).toLocaleDateString();
+const formatDate = (date: string): string => new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+});
 
 const breadcrumbs = [{ title: 'All Stocks', href: '/stocks' }];
+
+const checkIfExpired = (stock: any) => {
+    if (!stock.expiration_date) return false;
+    const currentDate = new Date();
+    const expirationDate = new Date(stock.expiration_date);
+    return currentDate > expirationDate;
+};
+
+const isLow = (stock: any): boolean => stock.quantity <= 10;
 </script>

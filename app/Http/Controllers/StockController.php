@@ -144,7 +144,7 @@ class StockController extends Controller
             'status' => 'required|string',
             'expiration_date' => 'nullable|date',
             'batch_number' => 'nullable|string',
-            'location_id' => 'nullable|uuid',
+            'location_id' => 'nullable|string',
         ]);
 
         $userId = auth()->id();
@@ -207,5 +207,12 @@ class StockController extends Controller
                 : $stock->wholesale_price
         ]);
     }
+
+    public function markExpired(Stock $stock)
+    {
+        $stock->update(['status' => 'expired','expired_at' => now()->toDateString()]);
+        return redirect()->back()->with('success', 'Stock marked as expired successfully.');
+    }
+
 
 }

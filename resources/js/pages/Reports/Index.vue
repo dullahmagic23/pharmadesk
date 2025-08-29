@@ -5,42 +5,43 @@
             <h1 class="text-3xl font-extrabold text-gray-800">System Reports</h1>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card 
-                    title="Sales Report" 
-                    icon="receipt" 
-                    to="/reports/sales" 
+                <Card
+                    title="Sales Report"
+                    icon="receipt"
+                    to="/reports/sales"
                     class="hover:shadow-lg transition-shadow duration-300"
                 />
-                <Card 
-                    title="Purchases Report" 
-                    icon="shopping-cart" 
-                    to="/reports/purchases" 
+                <Card
+                    title="Purchases Report"
+                    icon="shopping-cart"
+                    to="/reports/purchases"
                     class="hover:shadow-lg transition-shadow duration-300"
                 />
-                <Card 
-                    title="Stock Report" 
-                    icon="package" 
-                    to="/reports/stock" 
+                <Card
+                    title="Stock Report"
+                    icon="package"
+                    to="/reports/stock"
                     class="hover:shadow-lg transition-shadow duration-300"
                 />
-                <Card 
-                    title="Expired Medicines" 
-                    icon="alert-triangle" 
-                    to="/reports/expired" 
+
+<!--                <Card -->
+<!--                    title="Inventory Movement" -->
+<!--                    icon="shuffle" -->
+<!--                    to="/reports/inventories" -->
+<!--                    class="hover:shadow-lg transition-shadow duration-300"-->
+<!--                    :bgColor="'bg-blue-100'"-->
+<!--                    :textColor="'text-blue-800'"-->
+<!--                />-->
+                <Card
+                    title="Low Stock"
+                    icon="trending-down"
+                    to="/reports/low-stock"
                     class="hover:shadow-lg transition-shadow duration-300"
                 />
-                <Card 
-                    title="Inventory Movement" 
-                    icon="shuffle" 
-                    to="/reports/inventories" 
-                    class="hover:shadow-lg transition-shadow duration-300"
-                    :bgColor="'bg-blue-100'"
-                    :textColor="'text-blue-800'"
-                />
-                <Card 
-                    title="Low Stock" 
-                    icon="trending-down" 
-                    to="/reports/low-stock" 
+                <Card
+                    title="Expired Medicines"
+                    icon="alert-triangle"
+                    to="/reports/expired"
                     class="hover:shadow-lg transition-shadow duration-300"
                 />
             </div>

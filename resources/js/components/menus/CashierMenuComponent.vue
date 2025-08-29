@@ -7,24 +7,10 @@ import {
     FileTextIcon,
     LandmarkIcon,
     UsersRound,
-    ChartBar,
-    CalendarIcon,
     ChevronRightCircle,
     StoreIcon,
-    ListPlusIcon,
-    Settings2Icon,
-    HeartIcon,
     UsersRoundIcon,
     CircleDollarSignIcon,
-    Users2Icon,
-    UserPlus,
-    UserSquare2Icon,
-    Users2,
-    FileImageIcon,
-    Recycle,
-    UsersIcon,
-    UserPlus2Icon,
-    PlusSquare,
 } from 'lucide-vue-next';
 
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup } from '@/components/ui/dropdown-menu';
@@ -33,18 +19,10 @@ import { SidebarMenuButton } from '@/components/ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import SidebarDropdownMenuItem from '@/components/SidebarDropdownMenuItem.vue';
 import { usePage } from '@inertiajs/vue3';
-import {computed} from 'vue';
-
-const page = usePage();
 
 
 
 const { isMobile } = useSidebar();
-
-const hasAccess = (item: any)=>{
-    if (!item.roles) return true;
-    return item.roles.some((role: string) => auth.user.roles.includes(role));
-}
 
 const medicalItems = [
     {
@@ -56,16 +34,7 @@ const medicalItems = [
         ],
     },
 
-    {
-        title: 'Stocks',
-        icon: ListPlusIcon,
-        children: [
-            { title: 'Restock', href: '/stocks/create', icon: PlusCircleIcon },
-            { title: 'Manage Stock', href: '/stocks', icon: Settings2Icon },
-            { title: 'Stock Categories', href: '/medicine-categories', icon: ListCollapse },
-            { title: 'Stock Conversion', href: '/stock-conversion', icon: Recycle },
-        ],
-    },
+
 
     {
         title: 'Medicines',
@@ -85,14 +54,7 @@ const medicalItems = [
             { title: 'Manage Products', href: '/products', icon: ListFilter },
         ],
     },
-    {
-        title: 'Prescriptions',
-        icon: FileTextIcon,
-        children: [
-            { title: 'New Prescription', href: '/prescriptions/create', icon: PlusCircleIcon },
-            { title: 'Manage Prescriptions', href: '/prescriptions', icon: ListFilter },
-        ],
-    },
+
     {
         title: 'People',
         icon: UsersRound,
@@ -111,31 +73,6 @@ const medicalItems = [
                 children: [
                     { title: 'Register Patient', href: '/patients/create', icon: PlusCircleIcon },
                     { title: 'Manage Patients', href: '/patients', icon: ListFilter },
-                ],
-            },
-            {
-                title: 'Doctors',
-                icon: LandmarkIcon,
-                children: [
-                    { title: 'Add Doctor', href: '/doctors/create', icon: PlusCircleIcon },
-                    { title: 'Manage Doctors', href: '/doctors', icon: ListFilter },
-                ],
-            },
-            {
-                title: 'Users',
-                icon: UserSquare2Icon,
-                children: [
-                    { title: 'New User', href: '/users/create', icon: UserPlus },
-                    { title: 'Manage Users', href: '/users', icon: UsersIcon },
-                    { title: 'User Logs', href: '/users/activity-logs', icon: Users2 },
-                    {
-                        title: 'User Roles',
-                        icon: UserPlus2Icon,
-                        children: [
-                            { title: 'New Role', href: '/roles/create', icon: PlusSquare },
-                            {title: 'Manage Roles', href:'/roles', icon: ListPlusIcon}
-                        ],
-                    },
                 ],
             },
         ],
@@ -189,54 +126,6 @@ const medicalItems = [
                     { title: 'Manage Suppliers', href: '/suppliers', icon: ListFilter },
                 ],
             },
-            {
-                title: 'Bills',
-                href: '/bills',
-                icon: FileTextIcon,
-                children: [
-                    { title: 'New Bill', href: '/bills/create', icon: PlusCircleIcon },
-                    { title: 'Manage Bills', href: '/bills', icon: ListFilter },
-                    { title: 'Bill Payment', href: '/bill-payments/create', icon: ListFilter },
-                    { title: 'Payment History', href: '/bill-payments', icon: ListFilter },
-                ],
-            },
-            {
-                title: 'Purchase Orders',
-                href: '/purchases',
-                icon: FileTextIcon,
-                children: [
-                    { title: 'New Purchase Order', href: '/purchases/create', icon: PlusCircleIcon },
-                    { title: 'Manage Purchase Orders', href: '/purchases', icon: ListFilter },
-                ],
-            },
-        ],
-    },
-    {
-        title: 'Equipments',
-        icon: HeartIcon,
-        children: [
-            { title: 'Add Equipment', href: '/equipments/create', icon: PlusCircleIcon },
-            { title: 'Manage Equipments', href: '/equipments', icon: ListFilter },
-        ],
-    },
-    {
-        title: 'Appointments',
-        icon: CalendarIcon,
-        children: [
-            { title: 'New Appointment', href: '/appointments/create', icon: PlusCircleIcon },
-            { title: 'Manage Appointments', href: '/appointments', icon: ListFilter },
-        ],
-    },
-    {
-        title: 'Reports',
-        icon: ChartBar,
-        children: [
-            { title: 'Sales Report', href: '/reports/sales', icon: FileImageIcon },
-            // { title: 'Customers Report', href: '/reports/sales', icon: FileImageIcon },
-            // { title: 'Inventory Report', href: '/reports/sales', icon: FileImageIcon },
-            // { title: 'Stock Report', href: '/reports/sales', icon: FileImageIcon },
-            { title: 'Purchase Report', href: '/reports/sales', icon: FileImageIcon },
-            { title: 'Profit & Loss Report', href: '/reports/sales', icon: FileImageIcon },
         ],
     },
 ];

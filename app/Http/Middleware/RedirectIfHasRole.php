@@ -23,6 +23,10 @@ class RedirectIfHasRole
             if ($user->hasRole('doctor')) {
                 return redirect()->route('doctor.dashboard');
             }
+
+            if ($user->hasRole('cashier')){
+                return to_route('sales.create');
+            }
         }
 
         return $next($request);

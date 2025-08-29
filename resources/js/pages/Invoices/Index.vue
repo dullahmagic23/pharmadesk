@@ -41,8 +41,8 @@
 </template>
 
 <script lang="ts" setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { Pagination } from '@/Components/ui/pagination';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Pagination } from '@/components/ui/pagination';
 import { Link } from '@inertiajs/vue3';
 
 defineProps({

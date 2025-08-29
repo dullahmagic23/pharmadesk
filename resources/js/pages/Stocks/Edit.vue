@@ -170,6 +170,10 @@ const form = useForm({
     date: props.stock.date,
     selected_unit: props.stock.unit_id,
     status: props.stock.status,
+    expiration_date: props.stock.expration_date,
+    batch_number: props.stock.batch_number,
+    location_id: props.stock.location_id,
+    // date: props.stock.date,
 });
 
 const selectedMedicineUnits = computed(() => {

@@ -4,9 +4,10 @@ import { router, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table } from '@/components/ui/table';
 import currency from '@/modules/currecyFormatter';
+import { PrinterIcon, FileTextIcon, FileDownIcon, SearchIcon, FilterIcon,DeleteIcon } from 'lucide-vue-next';
+
 
 const props = defineProps<{
     sales: {
@@ -18,10 +19,15 @@ const props = defineProps<{
     };
 }>();
 
+
 const form = useForm({
     buyer_name: '',
     start_date: '',
     end_date: ''
+});
+
+const deleteForm = useForm({
+    sale_id: ''
 })
 
 const filteredSales = computed(() => {
@@ -38,118 +44,151 @@ const filteredSales = computed(() => {
 
         return matchesBuyerName && matchesStartDate && matchesEndDate;
     });
-})
+});
+
+// Watch the form to trigger a new request on filter change
+watch(form, () => {
+    router.get(
+        route('sales.index'),
+        {
+            buyer_name: form.buyer_name,
+            start_date: form.start_date,
+            end_date: form.end_date,
+        },
+        { preserveState: true, replace: true }
+    );
+}, { deep: true });
+
 const breadcrumbs = [
     { title: 'Dashboard', href: route('dashboard') },
     { title: 'Sales', href: route('sales.index') }
 ];
+
+const cancelSales = (id:string) => {
+    deleteForm.sale_id = id;
+    if (confirm('Are you sure you want to cancel this sale?')) {
+        deleteForm.delete(route('sales.destroy', id));
+    }
+}
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="container mx-auto p-6">
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold">Sales</h1>
-                <div class="justify-end space-x-4">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex items-center justify-between flex-wrap mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Sales History</h1>
+                <div class="flex items-center space-x-2 mt-4 md:mt-0">
                     <Link :href="route('sales.create')">
-                    <Button>New Sale</Button>
+                        <Button class="bg-blue-600 hover:bg-blue-700 transition-colors">
+                            <span class="mr-2">+</span> New Sale
+                        </Button>
                     </Link>
-                    <a :href="`/sales/export/pdf?start_date=${form.start_date}&end_date=${form.end_date}`">
-                        <Button variant="destructive">Export to pdf</Button>
-                    </a>
-
-                    <a :href="`/sales/export/excel?start_date=${form.start_date}&end_date=${form.end_date}`">
-                        <Button variant="outline">Export to Excel</Button>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Filters Section -->
-            <div class="mt-6 rounded-lg bg-gray-50 p-4">
-                <h2 class="mb-4 text-lg font-medium">Filters</h2>
-
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <!-- Search Field -->
-                    <div>
-                        <Input v-model="form.buyer_name" placeholder="Buyer name..." class="w-full" />
-                    </div>
-                    <div>
-                        <Input v-model="form.start_date" type="date" placeholder="From Date" class="w-full" />
-                    </div>
-
-                    <div>
-                        <Input v-model="form.end_date" type="date" placeholder="To Date" class="w-full" />
+                    <div class="hidden sm:flex space-x-2">
+                        <a :href="`/sales/export/pdf?start_date=${form.start_date}&end_date=${form.end_date}`">
+                            <Button variant="outline" class="flex items-center">
+                                <FileTextIcon class="w-4 h-4 mr-2" /> PDF
+                            </Button>
+                        </a>
+                        <a :href="`/sales/export/excel?start_date=${form.start_date}&end_date=${form.end_date}`">
+                            <Button variant="outline" class="flex items-center">
+                                <FileDownIcon class="w-4 h-4 mr-2" /> Excel
+                            </Button>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Sales Table -->
-            <div class="mt-6">
-                <Table>
-                    <thead>
-                        <tr class="text-left">
-                            <th>Date</th>
-                            <th>Buyer</th>
-                            <th>Items</th>
-                            <th>Total</th>
-                            <th>Paid</th>
-                            <th>Balance</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+            <div class="bg-white p-6 rounded-xl shadow-lg border mb-8">
+                <h2 class="flex items-center text-lg font-semibold text-gray-700 mb-4">
+                    <FilterIcon class="w-5 h-5 mr-2" /> Filter Sales
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <Input v-model="form.buyer_name" placeholder="Search by buyer name..." class="w-full h-10" />
+                    </div>
+                    <div>
+                        <Input v-model="form.start_date" type="date" placeholder="From Date" class="w-full h-10" />
+                    </div>
+                    <div>
+                        <Input v-model="form.end_date" type="date" placeholder="To Date" class="w-full h-10" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg border overflow-hidden">
+                <div class="overflow-x-auto">
+                    <Table class="w-full min-w-[900px]">
+                        <Thead>
+                        <tr class="bg-gray-50 text-gray-600 uppercase text-sm">
+                            <th class="py-3 px-6 text-left">Date</th>
+                            <th class="py-3 px-6 text-left">Buyer</th>
+                            <th class="py-3 px-6 text-left">Items</th>
+                            <th class="py-3 px-6 text-left">Total</th>
+                            <th class="py-3 px-6 text-left">Paid</th>
+                            <th class="py-3 px-6 text-left">Balance</th>
+                            <th class="py-3 px-6 text-center">Status</th>
+                            <th class="py-3 px-6 text-right">Actions</th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="my-1" v-for="sale in filteredSales" :key="sale.id">
-                            <td>{{ sale.created_at }}</td>
-                            <td>{{ sale.buyer_name }}</td>
-                            <td>{{ sale.items_count }}</td>
-                            <td>{{ currency(sale.total) }}</td>
-                            <td>{{ currency(sale.paid) }}</td>
-                            <td>{{ currency(sale.balance) }}</td>
-                            <td>
-                                <span :class="{
-                                    'rounded px-2 py-1 text-xs font-medium': true,
-                                    'bg-green-100 text-green-800': sale.status === 'paid',
-                                    'bg-yellow-100 text-yellow-800': sale.status === 'partial',
-                                    'bg-red-100 text-red-800': sale.status === 'unpaid',
-                                }">
-                                    {{ sale.status === 'paid' ? 'Paid' : sale.status === 'partial' ? 'Partially Paid' :
-                                        'Unpaid' }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="flex space-x-2">
+                        </Thead>
+                        <Tbody>
+                        <Tr v-if="filteredSales.length === 0">
+                            <Td colspan="8" class="text-center py-6 text-gray-500 italic">No sales found matching your filters.</Td>
+                        </Tr>
+                        <Tr v-else v-for="sale in filteredSales" :key="sale.id" class="border-b last:border-b-0 hover:bg-gray-100 transition-colors">
+                            <Td class="py-4 px-6">{{ new Date(sale.created_at).toLocaleDateString() }}</Td>
+                            <Td class="py-4 px-6 font-medium text-gray-800">{{ sale.buyer_name }}</Td>
+                            <Td class="py-4 px-6">{{ sale.items_count }}</Td>
+                            <Td class="py-4 px-6 font-bold text-gray-900">{{ currency(sale.total) }}</Td>
+                            <Td class="py-4 px-6 text-green-600 font-medium">{{ currency(sale.paid) }}</Td>
+                            <Td class="py-4 px-6 text-red-600 font-medium">{{ currency(sale.balance) }}</Td>
+                            <Td class="py-4 px-6 text-center">
+                                    <span :class="[
+                                        'rounded-full px-3 py-1 text-xs font-semibold',
+                                        {
+                                            'bg-green-100 text-green-800': sale.status === 'paid',
+                                            'bg-yellow-100 text-yellow-800': sale.status === 'partial',
+                                            'bg-red-100 text-red-800': sale.status === 'unpaid',
+                                        },
+                                    ]">
+                                        {{ sale.status === 'paid' ? 'Paid' : sale.status === 'partial' ? 'Partial' : 'Unpaid' }}
+                                    </span>
+                            </Td>
+                            <Td class="py-4 px-6 text-right">
+                                <div class="flex items-center justify-end space-x-1">
                                     <Link :href="route('sales.show', sale.id)">
-                                    <Button variant="ghost" size="sm"> View</Button>
+                                        <Button variant="ghost" size="sm" class="hover:bg-gray-200">View</Button>
                                     </Link>
-                                    <Link :href="route('sales.add-payments', sale.id)">
-                                    <Button v-if="sale.status !== 'paid'" size="sm" variant="default">Add
-                                        payment</Button>
+                                    <Link v-if="sale.status !== 'paid'" :href="route('sales.add-payments', sale.id)">
+                                        <Button size="sm" variant="outline" class="text-blue-600 hover:text-blue-700">Pay</Button>
                                     </Link>
-                                    <Button as="a" :href="route('sales.receipt', sale.id)" variant="ghost">
-                                        <PrinterIcon />Receipt
-                                    </Button>
+                                    <a :href="route('sales.receipt', sale.id)" target="_blank">
+                                        <Button size="icon" variant="ghost" class="hover:bg-gray-200">
+                                            <PrinterIcon class="w-5 h-5 text-gray-500 hover:text-gray-700" />
+                                        </Button>
+                                    </a>
+                                    <DeleteIcon class="w-4 h-4 mr-2" @click="cancelSales(sale.id)"/>
                                 </div>
-                            </td>
-                        </tr>
-                        <tr v-if="sales.data.length === 0">
-                            <td colspan="9" class="py-4 text-center">No sales found matching your filters.</td>
-                        </tr>
-                    </tbody>
-                </Table>
+                            </Td>
+                        </Tr>
+                        </Tbody>
+                    </Table>
+                </div>
+            </div>
 
-                <!-- Pagination -->
-                <div v-if="sales.links" class="mt-4">
-                    <!-- Add pagination component here based on your design system -->
-                    <!-- This is just an example structure -->
-                    <div class="flex items-center justify-between">
-                        <div>Showing {{ sales.from }} to {{ sales.to }} of {{ sales.total }} results</div>
-                        <div class="flex space-x-1">
-                            <Button v-for="(link, i) in sales.links" :key="i" :disabled="!link.url || link.active"
-                                :variant="link.active ? 'default' : 'outline'" @click="router.get(link.url)"
-                                v-html="link.label" />
-                        </div>
-                    </div>
+            <div v-if="sales.links.length > 3" class="mt-6 flex items-center justify-between flex-wrap">
+                <div class="text-sm text-gray-600 mb-2 md:mb-0">
+                    Showing <span class="font-bold">{{ sales.from }}</span> to <span class="font-bold">{{ sales.to }}</span> of <span class="font-bold">{{ sales.total }}</span> results
+                </div>
+                <div class="flex space-x-1 flex-wrap">
+                    <Button
+                        v-for="(link, i) in sales.links"
+                        :key="i"
+                        :disabled="!link.url"
+                        :variant="link.active ? 'default' : 'outline'"
+                        @click="router.get(link.url)"
+                        v-html="link.label"
+                        class="min-w-[40px] px-3 py-1"
+                    />
                 </div>
             </div>
         </div>

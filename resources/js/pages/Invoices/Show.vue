@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 import { computed } from 'vue'
 import currency from '../../modules/currecyFormatter.js';
 import { Link } from '@inertiajs/vue3';

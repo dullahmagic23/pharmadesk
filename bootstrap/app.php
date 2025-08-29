@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogUserActivity;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
              'log.activity' => LogUserActivity::class,
              'role' => App\Http\Middleware\RedirectIfHasRole::class,
+            'check.role' => CheckRole::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

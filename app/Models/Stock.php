@@ -4,6 +4,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Builder;
 
 class Stock extends Model
 {
@@ -23,7 +24,8 @@ class Stock extends Model
         'expiration_date',
         'status',
         'location_id',
-        'batch_number'
+        'batch_number',
+        'expired_at'
     ];
 
     /**
@@ -42,6 +44,26 @@ class Stock extends Model
     public function unit()
     {
         return $this->hasOne(MedicineUnit::class, 'id', 'unit_id');
+    }
+
+    public function scopeNotExpired(Builder $query): Builder
+    {
+        return $query->whereNull('expired_at');
+    }
+
+    /**
+     * Scope: only expired stocks
+     */
+    public function scopeExpired(Builder $query): Builder
+    {
+        return $query->whereNotNull('expired_at');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('notExpired', function (Builder $builder) {
+            $builder->whereNull('expired_at');
+        });
     }
 
 }
