@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle, Mail, Lock } from 'lucide-vue-next';
 
@@ -23,33 +22,35 @@ const submit = () => {
     });
 };
 </script>
-<template>
-    <div class="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white">
-        <!-- Header -->
-        <div class="py-8 text-center bg-blue-100 shadow-sm">
-            <img src="/assests/logo.png" alt="PharmaDesk Logo" class="h-12 mx-auto object-contain" />
-            <h1 class="mt-2 text-xl font-bold text-blue-700">PharmaDesk</h1>
-        </div>
 
-        <!-- Login Form Section -->
-        <div class="flex flex-1 items-center justify-center px-4 sm:px-6">
-            <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-md p-8 space-y-6">
-                
-                <div class="text-center">
-                    <h2 class="text-lg font-semibold text-gray-800">Welcome Back</h2>
-                    <p class="text-sm text-gray-500">Enter your credentials to access your account</p>
+<template>
+    <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
+        <Head title="Log in" />
+
+        <div class="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto">
+            <div class="flex flex-col items-center space-y-4 mb-8">
+                <img src="/assests/logo.png" alt="PharmaDesk Logo" class="h-16 object-contain" />
+                <h1 class="text-3xl font-extrabold text-blue-700 tracking-tight">PharmaDesk</h1>
+                <p class="text-sm text-gray-500 text-center max-w-xs">
+                    Your trusted platform for pharmacy management.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-2xl p-8 sm:p-10 border border-gray-100">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+                    <p class="text-sm text-gray-500 mt-1">Enter your credentials to access your account</p>
                 </div>
 
-                <div v-if="status" class="text-sm text-green-600 text-center font-semibold">
+                <div v-if="status" class="text-sm text-green-600 text-center font-semibold mb-4">
                     {{ status }}
                 </div>
 
-                <form @submit.prevent="submit" class="space-y-5">
-                    <!-- Email -->
+                <form @submit.prevent="submit" class="space-y-6">
                     <div>
-                        <Label for="email" class="block mb-1 text-sm font-medium text-gray-700">Email address</Label>
-                        <div class="relative">
-                            <Mail class="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Label for="email" class="block text-sm font-medium text-gray-700">Email address</Label>
+                        <div class="relative mt-1">
+                            <Mail class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                             <Input
                                 id="email"
                                 type="email"
@@ -57,27 +58,26 @@ const submit = () => {
                                 autofocus
                                 autocomplete="email"
                                 v-model="form.email"
-                                placeholder="email@example.com"
-                                class="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="name@example.com"
+                                class="pl-10 pr-4 py-2 w-full transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>
-                        <InputError :message="form.errors.email" class="mt-1" />
+                        <InputError :message="form.errors.email" class="mt-2" />
                     </div>
 
-                    <!-- Password -->
                     <div>
-                        <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center justify-between">
                             <Label for="password" class="text-sm font-medium text-gray-700">Password</Label>
                             <TextLink
                                 v-if="canResetPassword"
                                 :href="route('password.request')"
-                                class="text-xs text-blue-600 hover:underline"
+                                class="text-xs text-blue-600 hover:text-blue-800"
                             >
                                 Forgot password?
                             </TextLink>
                         </div>
-                        <div class="relative">
-                            <Lock class="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <div class="relative mt-1">
+                            <Lock class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                             <Input
                                 id="password"
                                 type="password"
@@ -85,26 +85,27 @@ const submit = () => {
                                 autocomplete="current-password"
                                 v-model="form.password"
                                 placeholder="••••••••"
-                                class="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                class="pl-10 pr-4 py-2 w-full transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>
-                        <InputError :message="form.errors.password" class="mt-1" />
+                        <InputError :message="form.errors.password" class="mt-2" />
                     </div>
 
-                    <!-- Remember Me -->
-                    <div class="flex items-center space-x-2">
-                        <Checkbox id="remember" v-model="form.remember" class="rounded" />
-                        <Label for="remember" class="text-sm text-gray-700 cursor-pointer">Remember me</Label>
+                    <div class="flex items-center justify-between pt-2">
+                        <div class="flex items-center space-x-2">
+                            <Checkbox id="remember" v-model="form.remember" class="w-4 h-4 rounded" />
+                            <Label for="remember" class="text-sm text-gray-700 cursor-pointer">Remember me</Label>
+                        </div>
                     </div>
 
-                    <!-- Submit Button -->
                     <Button
                         type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-semibold rounded-md shadow transition duration-200 ease-in-out transform hover:scale-105"
+                        class="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-md transition-all duration-200"
                         :disabled="form.processing"
+                        :class="{ 'opacity-75 cursor-not-allowed': form.processing }"
                     >
                         <LoaderCircle v-if="form.processing" class="h-5 w-5 mr-2 animate-spin" />
-                        Log in
+                        <span v-else>Log in</span>
                     </Button>
                 </form>
             </div>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import { router, Link, useForm } from '@inertiajs/vue3';
+import { router, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,19 @@ const props = defineProps<{
         total: number;
     };
 }>();
+
+const page = usePage();
+
+const user = page.props.auth.user;
+
+
+const isAdmin = computed(() => {
+    if (user.roles.filter((role: any) => role.name === 'admin').length > 0) {
+        return true;
+    } else {
+        return false;
+    }
+})
 
 
 const form = useForm({
@@ -162,11 +175,13 @@ const cancelSales = (id: string) => {
                                         <Button size="sm" variant="outline" class="text-blue-600 hover:text-blue-700">Pay</Button>
                                     </Link>
                                     <a :href="route('sales.receipt', sale.id)" target="_blank">
-                                        <Button size="icon" variant="ghost" class="hover:bg-gray-200">
+                                        <Button title="Print Receipt" size="icon" variant="ghost" class="hover:bg-gray-200">
                                             <PrinterIcon class="w-5 h-5 text-gray-500 hover:text-gray-700" />
                                         </Button>
                                     </a>
-                                    <DeleteIcon class="w-4 h-4 mr-2" @click="cancelSales(sale.id)"/>
+                                    <Button title="Cancel sales" v-if="isAdmin" size="icon" variant="ghost" class="hover:bg-gray-400 p-0" @click="cancelSales(sale.id)">
+                                        <DeleteIcon  v-if="isAdmin" class="w-4 h-4 mr-2" />
+                                    </Button>
                                 </div>
                             </td>
                         </tr>

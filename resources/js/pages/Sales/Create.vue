@@ -199,27 +199,11 @@
                                         <Button
                                             variant="ghost"
                                             size="icon"
+                                            title="Remove"
                                             class="text-red-500 hover:bg-red-50 rounded-full"
                                             @click="removeItem(index)"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000
-                               2v10a2 2 0 002 2h8a2 2 0
-                               002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1
-                               1 0 0011 2H9zM7 8a1 1 0
-                               012 0v6a1 1 0 11-2 0V8zm6
-                               0a1 1 0 112 0v6a1 1 0
-                               11-2 0V8z"
-                                                    clip-rule="evenodd"
-                                                />
-                                            </svg>
+                                            <DeleteIcon class="h-6 w-6" />
                                         </Button>
                                     </td>
                                 </tr>
@@ -336,6 +320,7 @@ import AppLayout from "@/layouts/AppLayout.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {DeleteIcon} from 'lucide-vue-next'
 import {
     Select,
     SelectContent,

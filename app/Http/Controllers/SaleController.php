@@ -76,6 +76,7 @@ class SaleController extends Controller
             $sale = Sale::create([
                 'buyer_type' => 'App\\Models\\Customer',
                 'buyer_id' => $validated['customer_id'],
+                'user_id' => auth()->id(),
                 'total' => $validated['total'],
                 'paid' => $validated['paid'],
                 'balance' => $validated['balance'],
@@ -102,6 +103,7 @@ class SaleController extends Controller
                 $sale->items()->create([
                     'sellable_type' => $stock->stockable_type,
                     'sellable_id' => $stock->stockable_id,
+                    'stock_id' => $item['stock_id'],
                     'quantity' => $item['quantity'],
                     'subtotal' => $item['quantity'] * $item['price'],
                     'price' => $item['price'],

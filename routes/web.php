@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\BillPaymentController;
+use App\Http\Controllers\CashierDashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EquipmentController;
@@ -41,6 +42,8 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'role'])->name('dashboard');
+
+Route::get('cashier/dashboard', [CashierDashboardController::class, 'index'])->middleware(['auth', 'verified', 'role:cashier'])->name('cashier.dashboard');
 
 require __DIR__ . '/settings.php';
 
@@ -93,7 +96,6 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
     Route::get('/sales/{sale}/add-payments', [SalePaymentController::class, 'addPayments'])->name('sales.add-payments')->middleware('auth');
     Route::post('/sales/{sale}/payments', [SalePaymentController::class, 'store'])->name('sales.payments.store');
     Route::middleware(['auth'])->get('/pharmacist/dashboard', fn() => Inertia::render('Pharmacist/Dashboard'))->name('pharmacist.dashboard');
-    Route::middleware(['auth'])->get('/cashier/dashboard', fn() => Inertia::render('Cashier/Dashboard'))->name('cashier.dashboard');
     Route::middleware(['auth'])->get('/doctor/dashboard', fn() => Inertia::render('Doctor/Dashboard'))->name('doctor.dashboard');
 });
 

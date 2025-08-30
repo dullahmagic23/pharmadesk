@@ -25,7 +25,7 @@ class RedirectIfHasRole
             }
 
             if ($user->hasRole('cashier')){
-                return to_route('sales.create');
+                return to_route('cashier.dashboard');
             }
         }
 

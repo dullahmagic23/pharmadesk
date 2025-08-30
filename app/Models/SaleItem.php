@@ -16,6 +16,7 @@ class SaleItem extends Model
         'sale_id',
         'sellable_id',
         'sellable_type',
+        'stock_id',
         'quantity',
         'price',
         'subtotal',
@@ -36,5 +37,10 @@ class SaleItem extends Model
     public function getTypeAttribute()
     {
         return $this->sellable_type === 'App\Models\Product'?'Product':'Medicine';
+    }
+
+    public function stock()
+    {
+        return $this->belongsTo(Stock::class);
     }
 }

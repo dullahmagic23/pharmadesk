@@ -11,7 +11,7 @@ class Sale extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['buyer_id', 'buyer_type', 'total', 'paid', 'balance', 'date'];
+    protected $fillable = ['buyer_id', 'buyer_type', 'total', 'paid', 'balance', 'date','user_id','customer_id'];
     protected $appends = ['type'];
 
 
@@ -37,6 +37,16 @@ class Sale extends Model
     public function receipt()
     {
         return $this->hasOne(Receipt::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
 }
