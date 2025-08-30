@@ -32,40 +32,40 @@
 
             <div class="bg-white rounded-xl shadow-lg border overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full divide-y divide-gray-200 min-w-[1200px]">
+                    <table class="w-full table-auto border-collapse">
                         <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Item</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Type</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Quantity</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Retail Price</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Wholesale Price</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Status</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Expiration Date</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Batch Number</th>
-                            <th class="py-3 px-6 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">Actions</th>
+                        <tr class="text-gray-600 uppercase text-xs">
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Item</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Type</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Quantity</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Retail Price</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Wholesale Price</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Status</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Expiration Date</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Batch Number</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Actions</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
                         <tr v-for="stock in filteredStocks" :key="stock.id" class="hover:bg-gray-50 transition-colors">
-                            <td class="py-4 px-6 font-medium text-gray-800">{{ stock.stockable?.name }}</td>
-                            <td class="py-4 px-6 text-gray-600">
+                            <td class="py-1.5 px-3 font-medium text-gray-800">{{ stock.stockable?.name }}</td>
+                            <td class="py-1.5 px-3 text-gray-600">
                                 {{ stock.stockable_type.includes('Product') ? 'Product' : 'Medicine' }}
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-1.5 px-3">
                                     <span :class="[
-                                        'px-2 py-1 rounded-full text-xs font-semibold',
+                                        'px-2 py-0.5 rounded-full text-xs font-semibold',
                                         {'bg-red-100 text-red-800': isLow(stock)},
                                         {'bg-green-100 text-green-800': !isLow(stock)}
                                     ]">
                                         {{ formatQuantity(stock.quantity) }} {{ stock.unit?.unit_name || '' }}
                                     </span>
                             </td>
-                            <td class="py-4 px-6 font-mono">{{ currency(stock.retail_price) }}</td>
-                            <td class="py-4 px-6 font-mono">{{ currency(stock.wholesale_price) }}</td>
-                            <td class="py-4 px-6">
+                            <td class="py-1.5 px-3 font-mono">{{ currency(stock.retail_price) }}</td>
+                            <td class="py-1.5 px-3 font-mono">{{ currency(stock.wholesale_price) }}</td>
+                            <td class="py-1.5 px-3">
                                     <span :class="[
-                                        'px-3 py-1 rounded-full text-xs font-semibold',
+                                        'px-2 py-0.5 rounded-full text-xs font-semibold',
                                         {'bg-red-100 text-red-800': stock.status === 'Expired'},
                                         {'bg-yellow-100 text-yellow-800': stock.status === 'Expiring Soon'},
                                         {'bg-green-100 text-green-800': stock.status === 'In Stock'},
@@ -73,9 +73,9 @@
                                         {{ stock.status }}
                                     </span>
                             </td>
-                            <td class="py-4 px-6">{{ stock.expiration_date ? formatDate(stock.expiration_date) : '-' }}</td>
-                            <td class="py-4 px-6">{{ stock.batch_number || '-' }}</td>
-                            <td class="py-4 px-6">
+                            <td class="py-1.5 px-3">{{ stock.expiration_date ? formatDate(stock.expiration_date) : '-' }}</td>
+                            <td class="py-1.5 px-3">{{ stock.batch_number || '-' }}</td>
+                            <td class="py-1.5 px-3">
                                 <div class="flex items-center space-x-2">
                                     <Link :href="route('stocks.edit', stock.id)">
                                         <Button variant="ghost" size="icon" class="text-gray-500 hover:text-blue-600">
@@ -83,11 +83,12 @@
                                         </Button>
                                     </Link>
                                     <Button
+                                        title="Mark as Expired"
                                         v-if="checkIfExpired(stock)"
                                         variant="ghost"
                                         size="icon"
                                         class="text-red-500 hover:bg-red-50 hover:text-red-600"
-                                        @click="confirmExpire(stock)"
+                                        @click="showConfirmModal = true; stockToConfirm = stock"
                                     >
                                         <AlertCircleIcon class="h-5 w-5" />
                                     </Button>
@@ -95,10 +96,25 @@
                             </td>
                         </tr>
                         <tr v-if="filteredStocks.length === 0">
-                            <td colspan="9" class="py-12 text-center text-gray-500 italic">No stocks found.</td>
+                            <td colspan="9" class="py-8 text-center text-gray-500 italic">No stocks found.</td>
                         </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Confirmation Modal -->
+            <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                <div class="bg-white rounded-lg p-6 shadow-xl w-full max-w-sm mx-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Confirm Action</h3>
+                        <button @click="showConfirmModal = false" class="text-gray-400 hover:text-gray-600">&times;</button>
+                    </div>
+                    <p class="text-gray-700 mb-6">Are you sure you want to mark this stock as expired? This action cannot be undone.</p>
+                    <div class="flex justify-end space-x-3">
+                        <Button @click="showConfirmModal = false" variant="outline">Cancel</Button>
+                        <Button @click="handleConfirmExpire" variant="default" class="bg-red-600 hover:bg-red-700">Confirm</Button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -136,6 +152,8 @@ const props = defineProps<{ stocks: Stock[] }>();
 
 const searchQuery = ref('');
 const selectedType = ref('');
+const showConfirmModal = ref(false);
+const stockToConfirm = ref<Stock | null>(null);
 
 const filteredStocks = computed(() => {
     if (!props.stocks) return [];
@@ -146,9 +164,11 @@ const filteredStocks = computed(() => {
     });
 });
 
-const confirmExpire = (stock: Stock) => {
-    if (confirm(`Are you sure you want to mark this stock as expired? This action cannot be undone.`)) {
-        router.patch(route('stocks.expire', stock.id))
+const handleConfirmExpire = () => {
+    if (stockToConfirm.value) {
+        router.patch(route('stocks.expire', stockToConfirm.value.id));
+        showConfirmModal.value = false;
+        stockToConfirm.value = null;
     }
 }
 

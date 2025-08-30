@@ -1,13 +1,25 @@
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="container mx-auto px-4 py-8">
-            <h1 class="text-3xl font-bold mb-6 text-gray-800">New Sale</h1>
+        <div class="container mx-auto px-4 py-8 space-y-8">
+            <!-- Page Title -->
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-gray-800">🛒 New Sale</h1>
+                <Button variant="outline" size="sm" class="rounded-lg" @click="toggleNewCustomerModal">
+                    + New Customer
+                </Button>
+            </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- LEFT SIDE -->
                 <div class="lg:col-span-2 space-y-8">
-                    <div class="bg-white p-6 rounded-xl shadow-lg border">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Customer Details</h2>
-                        <Label for="customer-select" class="block mb-2 font-medium">Select Customer</Label>
+                    <!-- Customer Details -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">
+                            Customer Details
+                        </h2>
+                        <Label for="customer-select" class="mb-2 font-medium block">
+                            Select Customer
+                        </Label>
                         <Select v-model="form.customer_id">
                             <SelectTrigger id="customer-select" class="w-full">
                                 <SelectValue placeholder="Search or select a customer" />
@@ -24,34 +36,65 @@
                                 </div>
                                 <SelectGroup>
                                     <SelectLabel>Customers</SelectLabel>
-                                    <SelectItem v-for="c in searchableCustomers" :key="c.id" :value="c.id">
+                                    <SelectItem
+                                        v-for="c in searchableCustomers"
+                                        :key="c.id"
+                                        :value="c.id"
+                                    >
                                         {{ c.name }}
                                     </SelectItem>
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                        <InputError :message="form.errors.customer_id" />
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl shadow-lg border">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Sale Items</h2>
+                    <!-- Sale Items -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-semibold text-gray-700">Sale Items</h2>
+                            <Button size="sm" @click="addItem" class="flex items-center">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 mr-2"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                                Add Item
+                            </Button>
+                        </div>
+
                         <div class="overflow-x-auto">
-                            <Table class="w-full min-w-[700px] text-sm">
-                                <thead>
-                                <tr class="text-left font-bold text-gray-600 border-b-2 border-gray-200">
+                            <table class="w-full text-sm">
+                                <thead class="sticky top-0 bg-gray-50 shadow-sm">
+                                <tr
+                                    class="text-left font-semibold text-gray-600 border-b border-gray-200"
+                                >
                                     <th class="py-2 px-4">Item</th>
                                     <th class="py-2 px-4">Sale Type</th>
                                     <th class="py-2 px-4 w-20">Qty</th>
                                     <th class="py-2 px-4 w-32">Price</th>
                                     <th class="py-2 px-4 w-32">Subtotal</th>
-                                    <th class="py-2 px-4 w-20"></th>
+                                    <th class="py-2 px-4 w-16 text-center">Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="(item, index) in form.items" :key="index" class="border-b hover:bg-gray-50 transition-colors">
+                                <tr
+                                    v-for="(item, index) in form.items"
+                                    :key="index"
+                                    class="border-b hover:bg-gray-50 transition"
+                                >
+                                    <!-- Item Select -->
                                     <td class="py-3 px-4">
                                         <Select v-model="item.stock_id">
                                             <SelectTrigger class="w-full">
-                                                <SelectValue placeholder="Select Medicine/Product" />
+                                                <SelectValue placeholder="Select Product" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <div class="p-2">
@@ -71,24 +114,42 @@
                                                         :value="s.id"
                                                         :disabled="isExpired(s) || s.quantity <= 0"
                                                     >
-                                                        <div class="flex items-center space-x-2">
-                                                                <span
-                                                                    :class="{
-                                                                        'text-red-600 font-medium': isExpired(s),
-                                                                        'text-yellow-600 font-medium': !isExpired(s) && isLow(s),
-                                                                    }"
-                                                                >
-                                                                    {{ s.stockable.name }} <span v-if="s.unit?.unit_name">({{ s.unit.unit_name }})</span>
-                                                                </span>
-                                                            <span v-if="isExpired(s)" class="text-xs text-red-500 italic">Expired</span>
-                                                            <span v-else-if="isLow(s)" class="text-xs text-orange-500 italic">Low ({{ s.quantity }})</span>
-                                                            <span v-else class="text-xs text-gray-500 italic">In stock: {{ s.quantity }}</span>
+                                                        <div class="flex flex-col">
+                                <span
+                                    :class="{
+                                    'text-red-600 font-medium': isExpired(s),
+                                    'text-yellow-600 font-medium':
+                                      !isExpired(s) && isLow(s),
+                                  }"
+                                >
+                                  {{ s.stockable.name }}
+                                  <span v-if="s.unit?.unit_name"
+                                  >({{ s.unit.unit_name }})</span
+                                  >
+                                </span>
+                                                            <span
+                                                                v-if="isExpired(s)"
+                                                                class="text-xs text-red-500 italic"
+                                                            >Expired</span
+                                                            >
+                                                            <span
+                                                                v-else-if="isLow(s)"
+                                                                class="text-xs text-orange-500 italic"
+                                                            >Low ({{ s.quantity }})</span
+                                                            >
+                                                            <span
+                                                                v-else
+                                                                class="text-xs text-gray-500 italic"
+                                                            >In stock: {{ s.quantity }}</span
+                                                            >
                                                         </div>
                                                     </SelectItem>
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
                                     </td>
+
+                                    <!-- Sale Type -->
                                     <td class="py-3 px-4">
                                         <Select v-model="item.sale_type">
                                             <SelectTrigger class="w-full">
@@ -103,63 +164,165 @@
                                             </SelectContent>
                                         </Select>
                                     </td>
-                                    <td class="py-3 px-4">
-                                        <Input type="number" v-model.number="item.quantity" min="1" class="w-full" />
+
+                                    <!-- Qty -->
+                                    <td class="py-3">
+                                        <Input
+                                            type="number"
+                                            v-model.number="item.quantity"
+                                            min="1"
+                                            class="w-full"
+                                        />
                                     </td>
-                                    <td class="py-3 px-4">
-                                        <Input type="number" v-model.number="item.price" min="0" :value="item.price.toFixed(2)" class="w-full" />
+
+                                    <!-- Price -->
+                                    <td class="py-3">
+                                        <Input
+                                            type="number"
+                                            v-model.number="item.price"
+                                            min="0"
+                                            class="w-full"
+                                        />
                                     </td>
-                                    <td class="py-3 px-4 font-bold text-gray-800">
-                                        {{ (item.quantity * item.price).toFixed(2) }}
+
+                                    <!-- Subtotal -->
+                                    <td class="py-3">
+                      <span
+                          class="px-2 py-1 rounded-lg bg-gray-100 font-semibold text-gray-700"
+                      >
+                        {{ (item.quantity * item.price).toFixed(2) }}
+                      </span>
                                     </td>
-                                    <td class="py-3 px-4 text-center">
-                                        <Button variant="ghost" size="sm" @click="removeItem(index)" class="text-red-500 hover:text-red-700">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+
+                                    <!-- Delete -->
+                                    <td class="py-3 text-center">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            class="text-red-500 hover:bg-red-50 rounded-full"
+                                            @click="removeItem(index)"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fill-rule="evenodd"
+                                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000
+                               2v10a2 2 0 002 2h8a2 2 0
+                               002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1
+                               1 0 0011 2H9zM7 8a1 1 0
+                               012 0v6a1 1 0 11-2 0V8zm6
+                               0a1 1 0 112 0v6a1 1 0
+                               11-2 0V8z"
+                                                    clip-rule="evenodd"
+                                                />
                                             </svg>
                                         </Button>
                                     </td>
                                 </tr>
                                 </tbody>
-                            </Table>
+                            </table>
                         </div>
-                        <Button class="mt-4" @click="addItem">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                            </svg>
-                            Add Item
-                        </Button>
                     </div>
                 </div>
 
-                <div class="lg:col-span-1 space-y-8">
-                    <div class="bg-white p-6 rounded-xl shadow-lg border">
-                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Payment Summary</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <Label class="font-medium text-lg">Total</Label>
-                                <Input :value="form.total.toFixed(2)" disabled class="text-xl font-bold bg-gray-100 mt-1" />
-                            </div>
-                            <div>
-                                <Label for="paid" class="font-medium text-lg">Amount Paid</Label>
-                                <Input id="paid" type="number" v-model.number="form.paid" min="0" class="text-xl font-bold text-green-700 mt-1" />
-                            </div>
-                            <div>
-                                <Label class="font-medium text-lg">Balance</Label>
-                                <Input :value="form.balance.toFixed(2)" disabled class="text-xl font-bold bg-gray-100 mt-1" />
-                            </div>
+                <!-- RIGHT SIDE -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Payment Summary -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border space-y-4">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">
+                            Payment Summary
+                        </h2>
+
+                        <div class="p-3 rounded-xl bg-blue-50 text-blue-700 font-bold text-lg">
+                            Total: {{ form.total.toFixed(2) }}
+                        </div>
+
+                        <div>
+                            <Label for="paid" class="font-medium text-lg">Amount Paid</Label>
+                            <Input
+                                id="paid"
+                                type="number"
+                                v-model.number="form.paid"
+                                min="0"
+                                class="text-xl font-bold text-green-700 mt-1"
+                            />
+                        </div>
+
+                        <div
+                            :class="[
+                'p-3 rounded-xl font-bold text-lg',
+                form.balance === 0
+                  ? 'bg-green-50 text-green-700'
+                  : form.balance > 0
+                  ? 'bg-orange-50 text-orange-700'
+                  : 'bg-red-50 text-red-700',
+              ]"
+                        >
+                            Balance: {{ form.balance.toFixed(2) }}
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="bg-white p-6 rounded-xl shadow-lg border">
-                        <Button
-                            :disabled="form.processing || form.total <= 0"
-                            @click="form.post('/sales')"
-                            class="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700 transition-colors"
-                        >
-                            {{ form.processing ? 'Submitting...' : 'Submit Sale' }}
-                        </Button>
+        <!-- Sticky Submit -->
+        <div class="sticky bottom-0 bg-white border-t shadow-lg p-4">
+            <Button
+                :disabled="form.processing || form.total <= 0"
+                @click="form.post('/sales')"
+                class="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700 flex items-center justify-center"
+            >
+                <svg
+                    v-if="form.processing"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 mr-2 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    />
+                    <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                    />
+                </svg>
+                {{ form.processing ? "Submitting..." : "Submit Sale" }}
+            </Button>
+        </div>
+
+        <!-- New Customer Modal -->
+        <div v-if="showNewCustomerModal" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Add New Customer</h2>
+                    <Button variant="ghost" size="icon" @click="toggleNewCustomerModal" class="rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </Button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <Label for="new-customer-name" class="font-medium">Customer Name</Label>
+                        <Input id="new-customer-name" type="text" v-model="customerForm.newCustomerName" class="mt-1" />
                     </div>
+                    <div>
+                        <Label for="new-customer-phone" class="font-medium">Phone No.</Label>
+                        <Input id="new-customer-phone" type="text" v-model="customerForm.newCustomerPhone" class="mt-1" />
+                    </div>
+                    <Button class="w-full bg-blue-600 hover:bg-blue-700" @click="addNewCustomer">Save Customer</Button>
                 </div>
             </div>
         </div>
@@ -167,55 +330,66 @@
 </template>
 
 <script setup>
-import { computed, watch, ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table } from '@/components/ui/table';
+import { computed, watch, ref } from "vue";
+import { useForm } from "@inertiajs/vue3";
+import AppLayout from "@/layouts/AppLayout.vue";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Table } from "@/components/ui/table";
+import InputError from "@/components/InputError.vue";
+import axios from 'axios';
 
 const props = defineProps({
     customers: Array,
-    stocks: Array
+    stocks: Array,
 });
 
-const searchTerm = ref('');
-const search = ref('');
+const searchTerm = ref("");
+const search = ref("");
+const showNewCustomerModal = ref(false);
+
+const allCustomers = ref([]);
+// Initialize allCustomers with the prop data on component mount
+allCustomers.value = props.customers;
+
 
 const form = useForm({
-    customer_id: '',
+    customer_id: "",
     items: [
         {
-            sale_type: 'retail',
-            stock_id: '',
+            sale_type: "retail",
+            stock_id: "",
             quantity: 1,
             price: 0,
-            stock: null
-        }
+            stock: null,
+        },
     ],
     total: 0,
     paid: 0,
-    balance: 0
+    balance: 0,
 });
 
 // --- price handling ---
-const computePrice = computed(() => {
-    return form.items.map(item => {
-        const stock = props.stocks.find(s => s.id === item.stock_id);
-        if (!stock) return 0;
-        return item.sale_type === 'retail' ? stock.retail_price : stock.wholesale_price;
-    });
-});
-
 watch(
-    () => form.items.map(item => [item.sale_type, item.stock_id]),
+    () => form.items.map((item) => [item.sale_type, item.stock_id]),
     () => {
         form.items.forEach((item) => {
-            const stock = props.stocks.find(s => s.id === item.stock_id);
+            const stock = props.stocks.find((s) => s.id === item.stock_id);
             if (stock) {
-                item.price = item.sale_type === 'retail' ? stock.retail_price : stock.wholesale_price;
+                item.price =
+                    item.sale_type === "retail"
+                        ? stock.retail_price
+                        : stock.wholesale_price;
                 item.stock = stock;
             } else {
                 item.price = 0;
@@ -228,7 +402,7 @@ watch(
 
 // --- total & balance ---
 watch(
-    () => form.items.map(item => item.quantity * item.price),
+    () => form.items.map((item) => item.quantity * item.price),
     (subtotals) => {
         form.total = subtotals.reduce((sum, val) => sum + Number(val), 0);
     },
@@ -246,32 +420,30 @@ watch(
 // helpers
 function addItem() {
     form.items.push({
-        sale_type: 'retail',
-        stock_id: '',
+        sale_type: "retail",
+        stock_id: "",
         quantity: 1,
         price: 0,
-        stock: null
+        stock: null,
     });
 }
 
 function removeItem(index) {
-    if (confirm("Remove the item?")) {
-        form.items.splice(index, 1);
-    }
+    form.items.splice(index, 1);
 }
 
 const breadcrumbs = [
-    { title: 'Dashboard', href: '/' },
-    { title: 'Sales', href: '/sales' },
-    { title: 'New Sale', href: '/sales/create' }
+    { title: "Dashboard", href: "/" },
+    { title: "Sales", href: "/sales" },
+    { title: "New Sale", href: "/sales/create" },
 ];
 
 // --- Search filters ---
 const searchableCustomers = computed(() => {
     if (!searchTerm.value) {
-        return props.customers;
+        return allCustomers.value;
     }
-    return props.customers.filter(customer =>
+    return allCustomers.value.filter((customer) =>
         customer.name.toLowerCase().includes(searchTerm.value.toLowerCase())
     );
 });
@@ -280,7 +452,7 @@ const searchableItems = computed(() => {
     if (!search.value) {
         return props.stocks;
     }
-    return props.stocks.filter(stock =>
+    return props.stocks.filter((stock) =>
         stock.stockable.name.toLowerCase().includes(search.value.toLowerCase())
     );
 });
@@ -294,4 +466,40 @@ function isExpired(stock) {
 function isLow(stock) {
     return stock.quantity <= 5; // threshold configurable
 }
+
+// --- New Customer Modal Functions ---
+
+const customerForm = useForm({
+    newCustomerName: "",
+    newCustomerPhone: "",
+})
+function toggleNewCustomerModal() {
+    showNewCustomerModal.value = !showNewCustomerModal.value;
+    if (!showNewCustomerModal.value) {
+        customerForm.newCustomerName = '';
+        customerForm.newCustomerPhone = '';
+    }
+}
+
+function addNewCustomer() {
+    if (customerForm.newCustomerName.trim() === '') {
+        return;
+    }
+
+    //Send an axios POST request to the server to create a new customer
+    axios.post('/api/customers', {
+        name: customerForm.newCustomerName,
+        phone: customerForm.newCustomerPhone,
+    }). then(response => {
+        form.customer_id = response.data.id;
+        allCustomers.value.push(response.data);
+    })
+    toggleNewCustomerModal();
+}
 </script>
+
+<style scoped>
+* {
+    font-size: 0.85rem;
+}
+</style>

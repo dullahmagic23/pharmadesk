@@ -4,9 +4,9 @@ import { router, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Table } from '@/components/ui/table';
 import currency from '@/modules/currecyFormatter';
-import { PrinterIcon, FileTextIcon, FileDownIcon, SearchIcon, FilterIcon,DeleteIcon } from 'lucide-vue-next';
+import { PrinterIcon, FileTextIcon, FileDownIcon, SearchIcon, FilterIcon, DeleteIcon } from 'lucide-vue-next';
+import axios from 'axios';
 
 
 const props = defineProps<{
@@ -64,10 +64,10 @@ const breadcrumbs = [
     { title: 'Sales', href: route('sales.index') }
 ];
 
-const cancelSales = (id:string) => {
+const cancelSales = (id: string) => {
     deleteForm.sale_id = id;
     if (confirm('Are you sure you want to cancel this sale?')) {
-        deleteForm.delete(route('sales.destroy', id));
+        router.get('/api/sales/' + id);
     }
 }
 </script>
@@ -117,33 +117,33 @@ const cancelSales = (id:string) => {
 
             <div class="bg-white rounded-xl shadow-lg border overflow-hidden">
                 <div class="overflow-x-auto">
-                    <Table class="w-full min-w-[900px]">
-                        <Thead>
-                        <tr class="bg-gray-50 text-gray-600 uppercase text-sm">
-                            <th class="py-3 px-6 text-left">Date</th>
-                            <th class="py-3 px-6 text-left">Buyer</th>
-                            <th class="py-3 px-6 text-left">Items</th>
-                            <th class="py-3 px-6 text-left">Total</th>
-                            <th class="py-3 px-6 text-left">Paid</th>
-                            <th class="py-3 px-6 text-left">Balance</th>
-                            <th class="py-3 px-6 text-center">Status</th>
-                            <th class="py-3 px-6 text-right">Actions</th>
+                    <table class="w-full table-auto border-collapse">
+                        <thead>
+                        <tr class="bg-gray-50 text-gray-600 uppercase text-xs">
+                            <th class="py-2 px-4 text-left">Date</th>
+                            <th class="py-2 px-4 text-left">Buyer</th>
+                            <th class="py-2 px-4 text-left">Items</th>
+                            <th class="py-2 px-4 text-left">Total</th>
+                            <th class="py-2 px-4 text-left">Paid</th>
+                            <th class="py-2 px-4 text-left">Balance</th>
+                            <th class="py-2 px-4 text-center">Status</th>
+                            <th class="py-2 px-4 text-right">Actions</th>
                         </tr>
-                        </Thead>
-                        <Tbody>
-                        <Tr v-if="filteredSales.length === 0">
-                            <Td colspan="8" class="text-center py-6 text-gray-500 italic">No sales found matching your filters.</Td>
-                        </Tr>
-                        <Tr v-else v-for="sale in filteredSales" :key="sale.id" class="border-b last:border-b-0 hover:bg-gray-100 transition-colors">
-                            <Td class="py-4 px-6">{{ new Date(sale.created_at).toLocaleDateString() }}</Td>
-                            <Td class="py-4 px-6 font-medium text-gray-800">{{ sale.buyer_name }}</Td>
-                            <Td class="py-4 px-6">{{ sale.items_count }}</Td>
-                            <Td class="py-4 px-6 font-bold text-gray-900">{{ currency(sale.total) }}</Td>
-                            <Td class="py-4 px-6 text-green-600 font-medium">{{ currency(sale.paid) }}</Td>
-                            <Td class="py-4 px-6 text-red-600 font-medium">{{ currency(sale.balance) }}</Td>
-                            <Td class="py-4 px-6 text-center">
+                        </thead>
+                        <tbody>
+                        <tr v-if="filteredSales.length === 0">
+                            <td colspan="8" class="text-center py-4 text-gray-500 italic">No sales found matching your filters.</td>
+                        </tr>
+                        <tr v-else v-for="sale in filteredSales" :key="sale.id" class="border-b last:border-b-0 hover:bg-gray-100 transition-colors">
+                            <td class="py-2 px-4">{{ new Date(sale.created_at).toLocaleDateString() }}</td>
+                            <td class="py-2 px-4 font-medium text-gray-800">{{ sale.buyer_name }}</td>
+                            <td class="py-2 px-4">{{ sale.items_count }}</td>
+                            <td class="py-2 px-4 font-bold text-gray-900">{{ currency(sale.total) }}</td>
+                            <td class="py-2 px-4 text-green-600 font-medium">{{ currency(sale.paid) }}</td>
+                            <td class="py-2 px-4 text-red-600 font-medium">{{ currency(sale.balance) }}</td>
+                            <td class="py-2 px-4 text-center">
                                     <span :class="[
-                                        'rounded-full px-3 py-1 text-xs font-semibold',
+                                        'rounded-full px-2 py-0.5 text-xs font-semibold',
                                         {
                                             'bg-green-100 text-green-800': sale.status === 'paid',
                                             'bg-yellow-100 text-yellow-800': sale.status === 'partial',
@@ -152,8 +152,8 @@ const cancelSales = (id:string) => {
                                     ]">
                                         {{ sale.status === 'paid' ? 'Paid' : sale.status === 'partial' ? 'Partial' : 'Unpaid' }}
                                     </span>
-                            </Td>
-                            <Td class="py-4 px-6 text-right">
+                            </td>
+                            <td class="py-2 px-4 text-right">
                                 <div class="flex items-center justify-end space-x-1">
                                     <Link :href="route('sales.show', sale.id)">
                                         <Button variant="ghost" size="sm" class="hover:bg-gray-200">View</Button>
@@ -168,10 +168,10 @@ const cancelSales = (id:string) => {
                                     </a>
                                     <DeleteIcon class="w-4 h-4 mr-2" @click="cancelSales(sale.id)"/>
                                 </div>
-                            </Td>
-                        </Tr>
-                        </Tbody>
-                    </Table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

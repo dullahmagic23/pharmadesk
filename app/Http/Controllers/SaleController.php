@@ -140,23 +140,5 @@ class SaleController extends Controller
         // (Optional: you can implement updates similarly to store)
     }
 
-    public function destroy($id)
-    {
-        $sale = Sale::findOrFail($id);
-        if ($sale->payments()->count() > 0) {
-            return redirect()->back()->with('error', 'Cannot delete sale with payments.');
-        }
-        foreach ($sale->items as $item) {
-            $stock = Stock::find($item->stock_id);
-            if ($stock) {
-                $stock->increment('quantity', $item->quantity);
-            }
-        }
-        $sale->receipt()->delete();
-        $sale->delete();
-
-        return redirect()->back()->with('success', 'Sale deleted.');
-    }
-
 
 }
