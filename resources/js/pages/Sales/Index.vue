@@ -5,10 +5,19 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import currency from '@/modules/currecyFormatter';
-import { PrinterIcon, FileTextIcon, FileDownIcon, SearchIcon, FilterIcon, DeleteIcon } from 'lucide-vue-next';
+import { PrinterIcon, FileTextIcon, FileDownIcon, EyeIcon, FilterIcon, DeleteIcon } from 'lucide-vue-next';
 import axios from 'axios';
 
-
+interface Auth{
+    user: {
+        id: string;
+        name: string;
+        email: string;
+        roles: {
+            name: string;
+        }[];
+    }
+}
 const props = defineProps<{
     sales: {
         data: any[];
@@ -97,12 +106,12 @@ const cancelSales = (id: string) => {
                         </Button>
                     </Link>
                     <div class="hidden sm:flex space-x-2">
-                        <a :href="`/sales/export/pdf?start_date=${form.start_date}&end_date=${form.end_date}`">
+                        <a v-if="isAdmin" :href="`/sales/export/pdf?start_date=${form.start_date}&end_date=${form.end_date}`">
                             <Button variant="outline" class="flex items-center">
                                 <FileTextIcon class="w-4 h-4 mr-2" /> PDF
                             </Button>
                         </a>
-                        <a :href="`/sales/export/excel?start_date=${form.start_date}&end_date=${form.end_date}`">
+                        <a v-if="isAdmin" :href="`/sales/export/excel?start_date=${form.start_date}&end_date=${form.end_date}`">
                             <Button variant="outline" class="flex items-center">
                                 <FileDownIcon class="w-4 h-4 mr-2" /> Excel
                             </Button>
@@ -169,7 +178,9 @@ const cancelSales = (id: string) => {
                             <td class="py-2 px-4 text-right">
                                 <div class="flex items-center justify-end space-x-1">
                                     <Link :href="route('sales.show', sale.id)">
-                                        <Button variant="ghost" size="sm" class="hover:bg-gray-200">View</Button>
+                                        <Button title="View" variant="ghost" size="sm" class="hover:bg-gray-200">
+                                            <EyeIcon class="w-5 h-5" />
+                                        </Button>
                                     </Link>
                                     <Link v-if="sale.status !== 'paid'" :href="route('sales.add-payments', sale.id)">
                                         <Button size="sm" variant="outline" class="text-blue-600 hover:text-blue-700">Pay</Button>
@@ -180,7 +191,7 @@ const cancelSales = (id: string) => {
                                         </Button>
                                     </a>
                                     <Button title="Cancel sales" v-if="isAdmin" size="icon" variant="ghost" class="hover:bg-gray-400 p-0" @click="cancelSales(sale.id)">
-                                        <DeleteIcon  v-if="isAdmin" class="w-4 h-4 mr-2" />
+                                        <DeleteIcon  v-if="isAdmin" class="w-5 h-5 mr-2" />
                                     </Button>
                                 </div>
                             </td>

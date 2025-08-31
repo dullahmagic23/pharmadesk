@@ -28,17 +28,12 @@ const submit = () => {
         <Head title="Log in" />
 
         <div class="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-            <div class="flex flex-col items-center space-y-4 mb-8">
-                <img src="/assests/logo.png" alt="PharmaDesk Logo" class="h-16 object-contain" />
-                <h1 class="text-3xl font-extrabold text-blue-700 tracking-tight">PharmaDesk</h1>
-                <p class="text-sm text-gray-500 text-center max-w-xs">
-                    Your trusted platform for pharmacy management.
-                </p>
-            </div>
-
             <div class="bg-white rounded-xl shadow-2xl p-8 sm:p-10 border border-gray-100">
+                <div class="flex flex-col items-center space-y-4 mb-2 border-b border-gray-200 pb-4 text-center">
+                    <img src="/assests/logo.png" alt="PharmaDesk Logo" class="h-32 object-contain" />
+                </div>
                 <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+                   <p class="text-sm font-bold">For Technical Support Call: +255625243136</p>
                     <p class="text-sm text-gray-500 mt-1">Enter your credentials to access your account</p>
                 </div>
 
@@ -64,7 +59,6 @@ const submit = () => {
                         </div>
                         <InputError :message="form.errors.email" class="mt-2" />
                     </div>
-
                     <div>
                         <div class="flex items-center justify-between">
                             <Label for="password" class="text-sm font-medium text-gray-700">Password</Label>
@@ -108,6 +102,9 @@ const submit = () => {
                         <span v-else>Log in</span>
                     </Button>
                 </form>
+                <div class="flex justify-center">
+                    <p  class="text-gray-600 mt-4">&copy; {{new Date().getFullYear()}} Royal Tech Services </p>
+                </div>
             </div>
         </div>
     </div>

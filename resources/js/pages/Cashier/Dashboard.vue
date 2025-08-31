@@ -52,7 +52,7 @@
                 <Link href="/sales" class="p-4 bg-yellow-500 text-white rounded-xl hover:bg-yellow-600 font-semibold shadow text-center">
                     Process Return
                 </Link>
-                <Link class="p-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-semibold shadow text-center">
+                <Link :href="route('receipts.index')" class="p-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-semibold shadow text-center">
                     Print Receipt
                 </Link>
             </div>
@@ -79,12 +79,12 @@
                                     <span :class="[
                                         'rounded-full px-2 py-0.5 text-xs font-semibold',
                                         {
-                                            'bg-green-100 text-green-800': transaction.status === 'paid',
-                                            'bg-yellow-100 text-yellow-800': transaction.status === 'partial',
-                                            'bg-red-100 text-red-800': transaction.status === 'unpaid',
+                                            'bg-green-100 text-green-800': getTransactionStatus(transaction) === 'paid',
+                                            'bg-yellow-100 text-yellow-800': getTransactionStatus(transaction) === 'partial',
+                                            'bg-red-100 text-red-800': getTransactionStatus(transaction) === 'unpaid',
                                         },
                                     ]">
-                                        {{ transaction.status === 'paid' ? 'Paid' : transaction.status === 'partial' ? 'Partial' : 'Unpaid' }}
+                                        {{ getTransactionStatus(transaction) === 'paid' ? 'Paid' : getTransactionStatus(transaction) === 'partial' ? 'Partial' : 'Unpaid' }}
                                     </span>
                         </td>
                         <td class="py-2">{{ formatDate(transaction.created_at) }}</td>
@@ -132,4 +132,14 @@ const formatDate = (value) => {
         day: 'numeric',
     });
 };
+
+const getTransactionStatus = (transaction)=>{
+    if (transaction.total === transaction.balance){
+        return 'unpaid'
+    } else if(transaction.paid < transaction.total){
+        return 'partial'
+    } else if (transaction.balance === 0){
+        return 'paid'
+    }
+}
 </script>

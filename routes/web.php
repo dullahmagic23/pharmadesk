@@ -44,12 +44,13 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified', 'role'])->name('dashboard');
 
 Route::get('cashier/dashboard', [CashierDashboardController::class, 'index'])->middleware(['auth', 'verified', 'role:cashier'])->name('cashier.dashboard');
-
+Route::resource('receipts', ReceiptController::class)->middleware('auth');
 require __DIR__ . '/settings.php';
 
 
 Route::resource('medicine-categories', MedicineCategoryController::class)->middleware('check.role:admin|cashier');
 Route::resource('expenses', ExpenseController::class)->middleware('auth');
+Route::resource('patients', PatientController::class)->middleware('auth');
 Route::middleware(['auth', 'log.activity'])->group(function () {
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('medicines', MedicineController::class);
@@ -70,7 +71,6 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
         Route::get('/sales/export/pdf', [SaleExportController::class, 'exportPdf'])->name('sales.export.pdf');
         Route::get('/sales/export/excel', [SaleExportController::class, 'exportExcel'])->name('sales.export.excel');
         Route::resource('bills', BillController::class)->middleware('auth');
-        Route::resource('patients', PatientController::class)->middleware('auth');
         Route::resource('doctors', DoctorController::class)->middleware('auth');
         Route::resource('prescriptions', PrescriptionController::class)->middleware('auth');
         Route::get('/prescriptions/{prescription}/download', [PrescriptionController::class, 'download'])->name('prescriptions.download');
@@ -83,7 +83,7 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
         Route::resource('roles', RoleController::class);
     });
 
-    Route::get('/sales/{sale}/receipt',[ReceiptController::class,'show'])->name('sales.receipt')->middleware('auth');
+    Route::get('/sales/{sale}/receipt',[SaleController::class,'printReceipt'])->name('sales.receipt')->middleware('auth');
     Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
     Route::middleware(['auth'])->get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::resource('payments', PaymentController::class)->middleware('auth');

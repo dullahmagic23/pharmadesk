@@ -53,6 +53,7 @@ const medicalItems = [
         children: [
             { title: 'New Sale', href: '/sales/create', icon: PlusCircleIcon },
             { title: 'Manage Sales', href: '/sales', icon: ListFilter },
+            {title:'Receipts',href:'/receipts',icon:FileTextIcon},
         ],
     },
 
