@@ -29,7 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
              'log.activity' => LogUserActivity::class,
              'role' => App\Http\Middleware\RedirectIfHasRole::class,
-            'check.role' => CheckRole::class
+            'check.role' => CheckRole::class,
+            'check.license' => App\Http\Middleware\CheckLicense::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

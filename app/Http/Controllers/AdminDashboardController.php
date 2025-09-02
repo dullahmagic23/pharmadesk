@@ -77,7 +77,6 @@ class AdminDashboardController extends Controller
             'expiringStocks' => $expiredItems['expiring'],
             'lowStocks' => $lowStocks,
 
-            // ✅ Sales data for charts
             'sales' => [
                 'labels' => $salesLine['labels'],
                 'values' => $salesLine['values'],

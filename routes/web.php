@@ -9,6 +9,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\LicenseCheckController;
 use App\Http\Controllers\MedicineCategoryController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PaymentController;
@@ -37,13 +38,13 @@ require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
     return Inertia::render('Dashboard');
-})->name('home')->middleware(['auth','role']);
+})->name('home')->middleware(['auth','role','check.license']);
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified', 'role'])->name('dashboard');
+})->middleware(['auth', 'verified', 'role','check.license'])->name('dashboard');
 
-Route::get('cashier/dashboard', [CashierDashboardController::class, 'index'])->middleware(['auth', 'verified', 'role:cashier'])->name('cashier.dashboard');
+Route::get('cashier/dashboard', [CashierDashboardController::class, 'index'])->middleware(['auth', 'verified', 'role:cashier','check.license'])->name('cashier.dashboard');
 Route::resource('receipts', ReceiptController::class)->middleware('auth');
 require __DIR__ . '/settings.php';
 
@@ -85,7 +86,7 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
 
     Route::get('/sales/{sale}/receipt',[SaleController::class,'printReceipt'])->name('sales.receipt')->middleware('auth');
     Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
-    Route::middleware(['auth'])->get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::middleware(['auth','check.role:admin','check.license'])->get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::resource('payments', PaymentController::class)->middleware('auth');
     Route::resource('vendors', VendorController::class)->middleware('auth');
     Route::resource('suppliers', SupplierController::class)->middleware('auth');
@@ -98,4 +99,6 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
     Route::middleware(['auth'])->get('/pharmacist/dashboard', fn() => Inertia::render('Pharmacist/Dashboard'))->name('pharmacist.dashboard');
     Route::middleware(['auth'])->get('/doctor/dashboard', fn() => Inertia::render('Doctor/Dashboard'))->name('doctor.dashboard');
 });
+Route::get('/license',[LicenseCheckController::class,'index'])->name('license.index');
+Route::get('/license-check',[LicenseCheckController::class,'index'])->name('license.check');
 
