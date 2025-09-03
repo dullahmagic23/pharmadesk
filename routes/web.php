@@ -50,7 +50,7 @@ Route::get('/license-check', [LicenseCheckController::class, 'index'])->name('li
 | Authenticated Routes
 |--------------------------------------------------------------------------
 */
-Route::group(['middleware' => ['auth', 'verified', 'check.license']], function (){
+Route::group(['middleware' => ['auth', 'verified', 'check.license','log.activity']], function (){
 
     // Default dashboard
     Route::group(['middleware' => 'role:admin|cashier|pharmacist|doctor'], function () {

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('activity_log', function (Blueprint $table) {
             $table->uuid('subject_id')->change();
+            $table->uuid('causer_id')->change();
         });
     }
 
