@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Services\LicenseService;
 use Illuminate\Support\Facades\Cache;
+use PharIo\Version\Exception;
 
 class CheckLicense
 {
@@ -24,7 +25,15 @@ class CheckLicense
         $status = Cache::get('license_status', 'invalid');
 
         if ($status !== 'active') {
-            abort(403, 'License is invalid, expired, or not authorized.');
+
+            try {
+                $check = $this->licenseService->verify();
+                if(!$check){
+                    abort(403, 'Licence verification failed. Contact support.');
+                }
+            }catch (Exception $exception){
+                abort(403, 'License is invalid, expired, or not authorized.');
+            }
         }
         // Optional: heartbeat asynchronously
         $this->licenseService->heartbeat();

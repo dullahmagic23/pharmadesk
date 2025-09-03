@@ -17,12 +17,9 @@ class DatabaseSeeder extends Seeder
         //        Doctor::factory(10)->create();
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Abdilah Ramadhani',
-            'email' => 'abdi@pharmadesk.test',
-            'password' => bcrypt('password'),
-        ]);
+
         $this->call([
+            RoleSeeder::class,
             DosageSeeder::class,
             // UserSeeder::class,
             MedicineUnitSeeder::class,
@@ -31,5 +28,13 @@ class DatabaseSeeder extends Seeder
             MedicineSeeder::class,
             // Add other seeders here
         ]);
+
+        $user = User::factory()->create([
+            'name' => 'Abdilah Ramadhani',
+            'email' => 'abdi@pharmadesk.test',
+            'password' => bcrypt('password'),
+        ]);
+
+        $user->assignRole('admin');
     }
 }
