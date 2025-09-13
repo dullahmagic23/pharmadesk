@@ -1,11 +1,12 @@
 import '../css/app.css';
 
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
+import { startSpinner, stopSpinner } from './utils/spinner';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -35,6 +36,20 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
+
+router.on('start', () => {
+    startSpinner(); // starts the loading spinner
+});
+
+// ✅ Stop spinner on successful navigation
+router.on('finish', () => {
+    stopSpinner(); // stops the spinner
+});
+
+// ❌ Stop spinner on error/failure (important for robustness)
+router.on('error', () => {
+    stopSpinner(); // avoid spinner getting stuck
+})
 
 // This will set light / dark mode on page load...
 initializeTheme();

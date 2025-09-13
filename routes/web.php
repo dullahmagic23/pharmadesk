@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\BillPaymentController;
@@ -17,8 +20,6 @@ use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\VendorController;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
@@ -36,69 +37,100 @@ use App\Http\Controllers\RoleController;
 
 require __DIR__ . '/auth.php';
 
-Route::get('/', function () {
-    return Inertia::render('Dashboard');
-})->name('home')->middleware(['auth','role','check.license']);
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/license', [LicenseCheckController::class, 'index'])->name('license.index');
+Route::get('/license-check', [LicenseCheckController::class, 'index'])->name('license.check');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified', 'role','check.license'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+Route::group(['middleware' => ['auth', 'verified', 'check.license']], function (){
 
-Route::get('cashier/dashboard', [CashierDashboardController::class, 'index'])->middleware(['auth', 'verified', 'role:cashier','check.license'])->name('cashier.dashboard');
-Route::resource('receipts', ReceiptController::class)->middleware('auth');
-require __DIR__ . '/settings.php';
-
-
-Route::resource('medicine-categories', MedicineCategoryController::class)->middleware('check.role:admin|cashier');
-Route::resource('expenses', ExpenseController::class)->middleware('auth');
-Route::resource('patients', PatientController::class)->middleware('auth');
-Route::middleware(['auth', 'log.activity'])->group(function () {
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::resource('medicines', MedicineController::class);
+    // Default dashboard
+    Route::group(['middleware' => 'role:admin|cashier|pharmacist|doctor'], function () {
+        Route::get('/', fn () => Inertia::render('Dashboard'))->name('home');
+        Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
     });
-    Route::resource('products', ProductController::class)->middleware('auth');
-    Route::group(['middleware' => 'check.role:admin'], function (){
-        Route::resource('stocks', StockController::class)->middleware('auth');
-        Route::resource('stock-histories', StockHistoryController::class)->middleware('auth');
-        Route::get('stock-conversion', [StockConversionController::class,'create'])->name('stock-conversion')->middleware('auth');
-        Route::post('stock_conversion', [StockConversionController::class,'store'])->name('stock_conversion.store')->middleware('auth');
-        Route::patch('/stocks/{stock}/expire', [StockController::class, 'markExpired'])
-            ->name('stocks.expire');
 
-        Route::get('/users/activity-logs', [UserController::class, 'userActivity'])->middleware('auth');
-        Route::resource('purchases', PurchaseController::class)->middleware('auth');
-        Route::resource('invoices', InvoiceController::class)->middleware('auth');
+    // Dashboards by role
+    Route::get('/cashier/dashboard', [CashierDashboardController::class, 'index'])
+        ->middleware('role:cashier')->name('cashier.dashboard');
+
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+        ->middleware('check.role:admin')->name('admin.dashboard');
+
+    Route::get('/pharmacist/dashboard', fn () => Inertia::render('Pharmacist/Dashboard'))
+        ->name('pharmacist.dashboard');
+
+    Route::get('/doctor/dashboard', fn () => Inertia::render('Doctor/Dashboard'))
+        ->name('doctor.dashboard');
+
+    // General resources
+    Route::resource('receipts', ReceiptController::class);
+    Route::resource('expenses', ExpenseController::class);
+    Route::resource('patients', PatientController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('payments', PaymentController::class);
+    Route::resource('vendors', VendorController::class);
+    Route::resource('suppliers', SupplierController::class);
+    Route::resource('equipments', EquipmentController::class);
+    Route::resource('bill-payments', BillPaymentController::class);
+    Route::resource('customers', CustomerController::class);
+    Route::resource('sales', SaleController::class);
+
+    // Sales extras
+    Route::get('/sales/{sale}/receipt', [SaleController::class, 'printReceipt'])->name('sales.receipt');
+    Route::get('/sales/{sale}/add-payments', [SalePaymentController::class, 'addPayments'])->name('sales.add-payments');
+    Route::post('/sales/{sale}/payments', [SalePaymentController::class, 'store'])->name('sales.payments.store');
+    Route::get('/sales/export/pdf', [SaleExportController::class, 'exportPdf'])->name('sales.export.pdf');
+    Route::get('/sales/export/excel', [SaleExportController::class, 'exportExcel'])->name('sales.export.excel');
+
+    // Medicines & categories
+    Route::resource('medicine-categories', MedicineCategoryController::class)->middleware('check.role:admin|cashier');
+    Route::resource('medicines', MedicineController::class);
+
+    // Stock management (admin only)
+    Route::middleware('check.role:admin')->group(function () {
+        Route::resource('stocks', StockController::class);
+        Route::resource('stock-histories', StockHistoryController::class);
+        Route::patch('/stocks/{stock}/expire', [StockController::class, 'markExpired'])->name('stocks.expire');
+
+        Route::get('stock-conversion', [StockConversionController::class, 'create'])->name('stock-conversion');
+        Route::post('stock-conversion', [StockConversionController::class, 'store'])->name('stock_conversion.store');
+
+        // Purchases & invoices
+        Route::resource('purchases', PurchaseController::class);
         Route::get('/purchases/{purchase}/print', [PurchaseController::class, 'print'])->name('purchases.print');
-        Route::get('/sales/export/pdf', [SaleExportController::class, 'exportPdf'])->name('sales.export.pdf');
-        Route::get('/sales/export/excel', [SaleExportController::class, 'exportExcel'])->name('sales.export.excel');
-        Route::resource('bills', BillController::class)->middleware('auth');
-        Route::resource('doctors', DoctorController::class)->middleware('auth');
-        Route::resource('prescriptions', PrescriptionController::class)->middleware('auth');
+        Route::resource('invoices', InvoiceController::class);
+        Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+
+        // Bills, doctors, prescriptions
+        Route::resource('bills', BillController::class);
+        Route::resource('doctors', DoctorController::class);
+        Route::resource('prescriptions', PrescriptionController::class);
         Route::get('/prescriptions/{prescription}/download', [PrescriptionController::class, 'download'])->name('prescriptions.download');
-        Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('auth');
-        Route::get('/reports/purchases', [ReportController::class, 'purchaseReport'])->name('reports.purchases')->middleware('auth');
-        Route::get('/reports/stock', [StockReportController::class, 'index'])->name('reports.stocks')->middleware('auth');
-        Route::get('/reports', fn() => Inertia::render('Reports/Index'))->name('reports.index');
-        Route::get('/reports/purchases/pdf', [PurchaseReportController::class, 'exportPdf'])->name('reports.purchases.pdf');
-        Route::resource('users', UserController::class)->middleware('auth');
+
+        // Reports
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', fn () => Inertia::render('Reports/Index'))->name('index');
+            Route::get('/sales', [ReportController::class, 'sales'])->name('sales');
+            Route::get('/purchases', [ReportController::class, 'purchaseReport'])->name('purchases');
+            Route::get('/purchases/pdf', [PurchaseReportController::class, 'exportPdf'])->name('purchases.pdf');
+            Route::get('/stock', [StockReportController::class, 'index'])->name('stocks');
+        });
+
+        // User management
+        Route::get('/users/activity-logs', [UserController::class, 'userActivity'])->name('users.activity');
+        Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
     });
 
-    Route::get('/sales/{sale}/receipt',[SaleController::class,'printReceipt'])->name('sales.receipt')->middleware('auth');
-    Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
-    Route::middleware(['auth','check.role:admin','check.license'])->get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::resource('payments', PaymentController::class)->middleware('auth');
-    Route::resource('vendors', VendorController::class)->middleware('auth');
-    Route::resource('suppliers', SupplierController::class)->middleware('auth');
-    Route::resource('equipments', EquipmentController::class)->middleware('auth');
-    Route::resource('bill-payments', BillPaymentController::class)->middleware('auth');
-    Route::resource('customers', CustomerController::class)->middleware('auth');
-    Route::resource('sales', SaleController::class)->middleware('auth');
-    Route::get('/sales/{sale}/add-payments', [SalePaymentController::class, 'addPayments'])->name('sales.add-payments')->middleware('auth');
-    Route::post('/sales/{sale}/payments', [SalePaymentController::class, 'store'])->name('sales.payments.store');
-    Route::middleware(['auth'])->get('/pharmacist/dashboard', fn() => Inertia::render('Pharmacist/Dashboard'))->name('pharmacist.dashboard');
-    Route::middleware(['auth'])->get('/doctor/dashboard', fn() => Inertia::render('Doctor/Dashboard'))->name('doctor.dashboard');
+    // Settings file (already grouped under auth)
+    require __DIR__ . '/settings.php';
 });
-Route::get('/license',[LicenseCheckController::class,'index'])->name('license.index');
-Route::get('/license-check',[LicenseCheckController::class,'index'])->name('license.check');
-

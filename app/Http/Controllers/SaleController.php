@@ -42,11 +42,23 @@ class SaleController extends Controller
             'sales' => $sales,
         ]);
     }
+
     public function create()
     {
+        // Fetch the customers
+        $customers = Customer::select('id', 'name')->get();
+
+        // Fetch the stocks, ordered by stockable name (assuming you want to sort by `name` of stockable)
+        $stocks = Stock::with(['stockable', 'unit'])
+            ->get()
+            ->sortBy(function ($stock) {
+                return $stock->stockable->name ?? '';
+            })
+            ->values(); // Reindex the collection
+
         return inertia('Sales/Create', [
-            'customers' => Customer::select('id', 'name')->get(),
-            'stocks' => Stock::with(['stockable', 'unit'])->get()
+            'customers' => $customers,
+            'stocks' => $stocks,
         ]);
     }
 

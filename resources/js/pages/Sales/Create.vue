@@ -20,7 +20,7 @@
                         <Label for="customer-select" class="mb-2 font-medium block">
                             Select Customer
                         </Label>
-                        <Select v-model="form.customer_id">
+                        <Select :value="searchableCustomers[0].id" v-model="form.customer_id">
                             <SelectTrigger id="customer-select" class="w-full">
                                 <SelectValue placeholder="Search or select a customer" />
                             </SelectTrigger>
@@ -36,6 +36,7 @@
                                 </div>
                                 <SelectGroup>
                                     <SelectLabel>Customers</SelectLabel>
+                                    <SelectItem aria-selected="true" :value="searchableCustomers[0].id">{{searchableCustomers[0].name}}</SelectItem>
                                     <SelectItem
                                         v-for="c in searchableCustomers"
                                         :key="c.id"
@@ -122,7 +123,7 @@
                                       !isExpired(s) && isLow(s),
                                   }"
                                 >
-                                  {{ s.stockable.name }}
+                                  {{ s.stockable.name }} - {{s.stockable.brand}}
                                   <span v-if="s.unit?.unit_name"
                                   >({{ s.unit.unit_name }})</span
                                   >
@@ -233,6 +234,7 @@
                                 v-model.number="form.paid"
                                 min="0"
                                 class="text-xl font-bold text-green-700 mt-1"
+                                :value="form.total.toFixed(2)"
                             />
                         </div>
 
@@ -312,15 +314,14 @@
         </div>
     </AppLayout>
 </template>
-
 <script setup>
-import { computed, watch, ref } from "vue";
+import { computed, watch, ref, onMounted } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import AppLayout from "@/layouts/AppLayout.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {DeleteIcon} from 'lucide-vue-next'
+import { DeleteIcon } from 'lucide-vue-next'
 import {
     Select,
     SelectContent,
@@ -330,7 +331,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Table } from "@/components/ui/table";
 import InputError from "@/components/InputError.vue";
 import axios from 'axios';
 
@@ -343,10 +343,7 @@ const searchTerm = ref("");
 const search = ref("");
 const showNewCustomerModal = ref(false);
 
-const allCustomers = ref([]);
-// Initialize allCustomers with the prop data on component mount
-allCustomers.value = props.customers;
-
+const allCustomers = ref([...props.customers]);
 
 const form = useForm({
     customer_id: "",
@@ -362,6 +359,13 @@ const form = useForm({
     total: 0,
     paid: 0,
     balance: 0,
+});
+
+// ✅ Ensure first customer is pre-selected on mount
+onMounted(() => {
+    if (allCustomers.value.length > 0 && !form.customer_id) {
+        form.customer_id = allCustomers.value[0].id;
+    }
 });
 
 // --- price handling ---
@@ -453,11 +457,11 @@ function isLow(stock) {
 }
 
 // --- New Customer Modal Functions ---
-
 const customerForm = useForm({
     newCustomerName: "",
     newCustomerPhone: "",
 })
+
 function toggleNewCustomerModal() {
     showNewCustomerModal.value = !showNewCustomerModal.value;
     if (!showNewCustomerModal.value) {
@@ -471,20 +475,16 @@ function addNewCustomer() {
         return;
     }
 
-    //Send an axios POST request to the server to create a new customer
     axios.post('/api/customers', {
         name: customerForm.newCustomerName,
         phone: customerForm.newCustomerPhone,
-    }). then(response => {
-        form.customer_id = response.data.id;
+    }).then(response => {
         allCustomers.value.push(response.data);
-    })
+
+        // ✅ Auto-select the newly added customer
+        form.customer_id = response.data.id;
+    });
+
     toggleNewCustomerModal();
 }
 </script>
-
-<style scoped>
-* {
-    font-size: 0.85rem;
-}
-</style>

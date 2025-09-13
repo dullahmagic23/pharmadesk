@@ -16,7 +16,7 @@ const filterBrand = ref('')
 const filteredMedicines = computed(() => {
     return medicines.filter(medicine => {
         const matchesName = medicine.name.toLowerCase().includes(filterQuery.value.toLowerCase())
-        const matchesCategory = filterCategory.value ? medicine.category.name.toLowerCase().includes(filterCategory.value.toLowerCase()) : true
+        const matchesCategory = filterCategory.value ? medicine.category?.name.toLowerCase().includes(filterCategory.value.toLowerCase()) : true
         const matchesBrand = filterBrand.value ? medicine.brand.toLowerCase().includes(filterBrand.value.toLowerCase()) : true
         return matchesName && matchesCategory && matchesBrand
     })
@@ -46,7 +46,7 @@ const breadcrumbs = [
                     <select v-model="filterCategory" class="w-full p-2 border border-gray-300 rounded-md ml-2">
                         <option value="">Filter by Category</option>
                         <option
-                            v-for="category in medicines.map(m => m.category.name).filter((v, i, a) => a.indexOf(v) === i)"
+                            v-for="category in medicines.map(m => m.category?.name).filter((v, i, a) => a.indexOf(v) === i)"
                             :key="category" :value="category">
                             {{ category }}
                         </option>
@@ -73,10 +73,10 @@ const breadcrumbs = [
                         <tr v-for="medicine in filteredMedicines" :key="medicine.id">
                             <td class="px-4 py-2">{{ medicine.name }}</td>
                             <td class="px-4 py-2">{{ medicine.brand }}</td>
-                            <td class="px-4 py-2">{{ medicine.category.name }}</td>
+                            <td class="px-4 py-2">{{ medicine.category?.name }}</td>
                             <td class="px-4 py-2">
                                 <ul>
-                                    <li v-for="unit in medicine.units" :key="unit.id">{{ unit.unit_name }}</li>
+                                    <li v-for="unit in medicine?.units" :key="unit.id">{{ unit?.unit_name }}</li>
                                 </ul>
                             </td>
                             <td class="px-4 py-2">

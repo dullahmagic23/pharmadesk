@@ -37,7 +37,7 @@ const breadcrumbs = [
             <!-- Header -->
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-bold text-gray-800">🧾 Receipts</h1>
-                <Link href="/receipts/create">
+                <Link :href="route('receipts.create')">
                     <Button>➕ New Receipt</Button>
                 </Link>
             </div>
@@ -74,9 +74,9 @@ const breadcrumbs = [
                     >
                         <td class="px-6 py-4">{{ receipt.reference ?? '—' }}</td>
                         <td class="px-6 py-4">
-                            <a :href="`/sales/${receipt.sale_id}`" class="text-blue-600 hover:underline">
+                            <Link :href="`/sales/${receipt.sale_id}`" class="text-blue-600 hover:underline">
                                 {{ receipt.sale_id }}
-                            </a>
+                            </Link>
                         </td>
                         <td class="px-6 py-4 font-semibold text-gray-900">
                             {{ Number(receipt.sale?.total).toLocaleString() }}

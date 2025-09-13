@@ -62,6 +62,11 @@
                     </Select>
                     <InputError :message="form.errors.selected_unit" />
                 </div>
+                 <div>
+                            <Label for="buying_price" class="block font-medium mb-1">Buying Price (Tsh.)</Label>
+                            <Input id="buying_price" v-model="form.buying_price" type="number" min="0" step="0.01" placeholder="e.g., 15.50" />
+                            <InputError :message="form.errors.buying_price" />
+                        </div>
 
                 <!-- Quantity -->
                 <div>
@@ -164,6 +169,7 @@ const props = defineProps({
 const form = useForm({
     stockable_type: props.stock.stockable_type,
     stockable_id: props.stock.stockable_id,
+    buying_price: props.stock.buying_price,
     quantity: props.stock.quantity,
     retail_price: props.stock.retail_price,
     wholesale_price: props.stock.wholesale_price,

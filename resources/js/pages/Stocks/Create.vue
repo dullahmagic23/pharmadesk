@@ -70,9 +70,13 @@
                             </Select>
                             <InputError :message="form.errors.selected_unit" />
                         </div>
+                         <div>
+                            <Label for="buying_price" class="block font-medium mb-1">Buying Price (Tsh.)</Label>
+                            <Input id="buying_price" v-model="form.buying_price" type="number" min="0" step="0.01" placeholder="e.g., 15.50" />
+                            <InputError :message="form.errors.buying_price" />
+                        </div>
                     </div>
                     <hr class="md:col-span-2 border-gray-200 my-4" />
-
                     <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
                         <div>
                             <Label for="quantity" class="block font-medium mb-1">Quantity</Label>
@@ -81,13 +85,13 @@
                         </div>
 
                         <div>
-                            <Label for="retail_price" class="block font-medium mb-1">Retail Price ($)</Label>
+                            <Label for="retail_price" class="block font-medium mb-1">Retail Price (Tsh.)</Label>
                             <Input id="retail_price" v-model="form.retail_price" type="number" min="0" step="0.01" placeholder="e.g., 15.50" />
                             <InputError :message="form.errors.retail_price" />
                         </div>
 
                         <div>
-                            <Label for="wholesale_price" class="block font-medium mb-1">Wholesale Price ($)</Label>
+                            <Label for="wholesale_price" class="block font-medium mb-1">Wholesale Price (TSh.)</Label>
                             <Input id="wholesale_price" v-model="form.wholesale_price" type="number" min="0" step="0.01" placeholder="e.g., 12.00" />
                             <InputError :message="form.errors.wholesale_price" />
                         </div>
@@ -175,6 +179,7 @@ const form = useForm({
     stockable_type: '',
     stockable_id: '',
     quantity: '',
+    buying_price: '',
     retail_price: '',
     wholesale_price: '',
     date: new Date().toISOString().slice(0, 10),

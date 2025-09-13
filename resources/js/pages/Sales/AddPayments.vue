@@ -18,7 +18,7 @@ const props = defineProps<{
 }>();
 
 const form = useForm({
-    amount: '',
+    amount: 0,
 });
 
 function submit() {
@@ -26,7 +26,7 @@ function submit() {
 }
 
 function payFullBalance() {
-    form.amount = props.sale.balance.toFixed(2);
+    form.amount = props.sale.balance;
 }
 
 const breadcrumbs = [

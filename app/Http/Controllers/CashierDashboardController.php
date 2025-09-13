@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Product;
+use App\Models\Stock;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Arr;
 
@@ -23,10 +24,10 @@ class CashierDashboardController extends Controller
     {
             $salesToday = Sale::whereDate('created_at', now())->sum('total');
             $transactions = SalePayment::whereDate('created_at', now())->count();
-            $pendingOrders = Sale::where('status', 'pending')->count();
+            $pendingOrders = Sale::where('balance', '>',0)->count();
 
             $lowStock = Cache::remember('low_stock_count', now()->addMinutes(5), function () {
-                return Product::whereColumn('quantity', '<=', 'min_stock')->count();
+                return Stock::where('quantity', '<=', 10)->count();
             });
 
             $recentTransactions = Sale::with('customer')

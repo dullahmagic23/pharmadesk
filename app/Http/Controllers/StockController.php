@@ -18,7 +18,11 @@ class StockController extends Controller
      */
     public function index()
     {
-        $stocks = Stock::with('stockable', 'unit')->latest()->get();
+        $stocks = Stock::with('stockable', 'unit')->get();
+        $stocks = $stocks->sortBy(function ($stock) {
+            return $stock->stockable->name ?? '';
+        })->values();
+
         return Inertia::render('Stocks/Index', [
             'stocks' => $stocks,
         ]);
@@ -45,6 +49,7 @@ class StockController extends Controller
             'stockable_type' => 'required|in:App\Models\Product,App\Models\Medicine',
             'stockable_id' => 'required|uuid',
             'quantity' => 'required|numeric|min:0.01',
+            'buying_price' => 'required|numeric|min:0',
             'retail_price' => 'required|numeric|min:0',
             'wholesale_price' => 'required|numeric|min:0',
             'date' => 'nullable|date',
@@ -70,6 +75,7 @@ class StockController extends Controller
                 'quantity' => $stock->quantity + $validated['quantity'],
                 'retail_price' => $validated['retail_price'],
                 'wholesale_price' => $validated['wholesale_price'],
+                'buying_price' => $validated['buying_price'],
                 'status' => $validated['status'],
                 'expiration_date' => $validated['expiration_date'] ?? null,
                 'batch_number' => $validated['batch_number'] ?? null,
@@ -80,6 +86,7 @@ class StockController extends Controller
             $stockData = [
                 'stockable_type' => $validated['stockable_type'],
                 'stockable_id' => $validated['stockable_id'],
+                'buying_price' => $validated['buying_price'],
                 'quantity' => $validated['quantity'],
                 'retail_price' => $validated['retail_price'],
                 'wholesale_price' => $validated['wholesale_price'],
@@ -136,6 +143,7 @@ class StockController extends Controller
         $validated = $request->validate([
             'stockable_type' => 'required|in:App\Models\Product,App\Models\Medicine',
             'stockable_id' => 'required|uuid',
+            'buying_price' => 'required|numeric|min:0',
             'quantity' => 'required|numeric|min:0.01',
             'retail_price' => 'required|numeric|min:0',
             'wholesale_price' => 'required|numeric|min:0',
@@ -150,6 +158,7 @@ class StockController extends Controller
         $userId = auth()->id();
         $stock->quantity = $validated['quantity'];
         $stock->retail_price = $validated['retail_price'];
+        $stock->buying_price = $validated['buying_price'];
         $stock->wholesale_price = $validated['wholesale_price'];
         $stock->status = $validated['status'];
         $stock->expiration_date = $validated['expiration_date'] ?? null;

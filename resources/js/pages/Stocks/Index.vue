@@ -38,6 +38,7 @@
                             <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Item</th>
                             <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Type</th>
                             <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Quantity</th>
+                            <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Buying Price</th>
                             <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Retail Price</th>
                             <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Wholesale Price</th>
                             <th class="py-1.5 px-3 text-left font-semibold tracking-wider">Status</th>
@@ -61,6 +62,7 @@
                                         {{ formatQuantity(stock.quantity) }} {{ stock.unit?.unit_name || '' }}
                                     </span>
                             </td>
+                            <td class="py-1.5 px-3 font-mono">{{ currency(stock.buying_price) }}</td>
                             <td class="py-1.5 px-3 font-mono">{{ currency(stock.retail_price) }}</td>
                             <td class="py-1.5 px-3 font-mono">{{ currency(stock.wholesale_price) }}</td>
                             <td class="py-1.5 px-3">
@@ -135,6 +137,7 @@ interface Stock {
     id: string;
     stockable?: { name: string };
     stockable_type: string;
+    buying_price: number;
     unit?: { unit_name: string };
     quantity: number;
     retail_price: number;

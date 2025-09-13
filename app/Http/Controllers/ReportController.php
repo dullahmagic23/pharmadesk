@@ -15,7 +15,7 @@ class ReportController extends Controller
 
     public function sales(Request $request)
     {
-        $sales = Sale::with(['items.sellable'])
+        $sales = Sale::with(['items.sellable.stock'])
             ->when(
                 $request->from && $request->to,
                 fn($q) =>

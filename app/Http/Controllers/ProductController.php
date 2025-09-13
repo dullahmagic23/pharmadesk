@@ -8,7 +8,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::all(); // You can paginate if you prefer
+        $products = Product::orderBy('name','asc')->get(); // You can paginate if you prefer
         return Inertia::render('Products/Index', [
             'products' => $products
         ]);
@@ -37,7 +37,7 @@ class ProductController extends Controller
             'unit' => $request->unit,
         ]);
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        return redirect()->back()->with('success', 'Product created successfully.');
     }
 
     public function edit($id)

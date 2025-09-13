@@ -14,9 +14,8 @@ use App\Services\MedicineCacheService;
 
 class MedicineController extends Controller
 {
-    public function index(MedicineCacheService $cacheService)
+    public function index()
     {
-        $medicines = $cacheService->all();
         $medicines = Medicine::with([
             'category' => function ($query) {
                 $query->select('id', 'name');
@@ -24,7 +23,7 @@ class MedicineController extends Controller
             'units' => function ($query) {
                 $query->select('id', 'unit_name');
             }
-        ])->get();
+        ])->orderBy('name')->get();
         return Inertia::render('Medicines/Index', [
             'medicines' => $medicines,
         ]);
@@ -68,7 +67,7 @@ class MedicineController extends Controller
             $medicine->units()->sync($unitIds); // assuming belongsToMany
         });
         $cacheService->clear();
-        $cacheService->all();
+        //$cacheService->all();
         return redirect()->back()->with('success', 'Medicine created successfully.');
     }
 
