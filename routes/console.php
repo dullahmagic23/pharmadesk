@@ -46,11 +46,11 @@ Artisan::command('license:check', function () {
 
     if ($licenseService->verify()) {
         $this->info('License is valid.');
-        Cache::put('license_status', 'active', now()->addDay());
+        Cache::put('license_status', 'active', now()->addMonths(1));
     } else {
         $this->warn('License is invalid or expired.');
-        Cache::put('license_status', 'invalid', now()->addDay());
+        Cache::put('license_status', 'invalid', now()->addMonths(1));
     }
 
 })->describe('Check the validity of the license key with LicenseServer');
-Schedule::command('license:check')->daily();
+Schedule::command('license:check')->monthly();

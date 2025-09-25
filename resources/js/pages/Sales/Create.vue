@@ -20,7 +20,7 @@
                         <Label for="customer-select" class="mb-2 font-medium block">
                             Select Customer
                         </Label>
-                        <Select :value="searchableCustomers[0].id" v-model="form.customer_id">
+                        <Select :value="searchableCustomers[0]?.id" v-model="form.customer_id">
                             <SelectTrigger id="customer-select" class="w-full">
                                 <SelectValue placeholder="Search or select a customer" />
                             </SelectTrigger>

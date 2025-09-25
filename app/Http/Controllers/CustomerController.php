@@ -32,10 +32,10 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        Customer::create(array_merge($data, ['id' => (string) Str::uuid()]));
+        Customer::create($data);
         $customerCache->clear();
         $customerCache->all();
-        return redirect()->route('customers.index')->with('success', 'Customer created successfully.');;
+        return redirect()->back()->with('success', 'Customer created successfully.');
     }
 
     public function show(Customer $customer)

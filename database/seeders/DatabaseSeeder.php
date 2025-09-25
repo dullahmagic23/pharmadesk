@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Doctor;
 use App\Models\User;
+use App\Models\Customer;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -30,11 +31,15 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $user = User::factory()->create([
-            'name' => 'Abdilah Ramadhani',
-            'email' => 'abdi@pharmadesk.test',
+            'name' => 'Admin',
+            'email' => 'admin@pharmadesk.test',
             'password' => bcrypt('password'),
         ]);
 
         $user->assignRole('admin');
+
+        Customer::create([
+            'name' => 'Walk-in Customer',
+        ]);
     }
 }

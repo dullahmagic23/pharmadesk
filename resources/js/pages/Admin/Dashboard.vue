@@ -1,207 +1,241 @@
-<template>
-    <AppLayout :breadcrumbs="breadcrumb">
-        <Head title="Admin Dashboard" />
-        <div class="container mx-auto px-4 py-8">
-            <!-- Greeting Section -->
-            <div class="mb-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-3xl shadow-lg">
-                <div class="flex flex-col md:flex-row md:items-center justify-between">
-                    <div class="mb-4 md:mb-0">
-                        <h1 class="text-xl font-extrabold text-gray-900 leading-tight">
-                            Welcome, {{ user.name }}
-                        </h1>
-                        <p class="mt-2 text-lg text-blue-700 font-medium capitalize">
-                            {{ user.roles?.[0]?.name || 'No Role Assigned' }} Dashboard
-                        </p>
-                    </div>
-                    <div class="text-right italic text-gray-600 max-w-sm">
-                        <small class="font-semibold">Quote of the Day:</small>
-                        <p class="mt-1 font-light text-sm">{{ page.props.quote.message }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stock Alerts -->
-            <div
-                v-if="expiredStocks.length || expiringStocks.length || lowStocks.length"
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
-            >
-                <!-- Expired -->
-                <div v-if="expiredStocks.length" class="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 shadow-md">
-                    <h2 class="flex items-center text-xl font-bold text-red-800 mb-3">
-                        <span class="mr-2 text-2xl">⚠️</span> Expired Stock Batches ({{ expiredStocks.length }})
-                    </h2>
-                    <ul class="text-sm text-red-700 space-y-2">
-                        <li v-for="stock in expiredStocks" :key="stock.id" class="flex items-start">
-                            <span class="text-lg mr-2">•</span>
-                            <div>
-                                <span class="font-semibold">{{ stock.stockable.name }}</span>
-                                <small class="italic text-xs">(Batch: {{ stock.batch_number }})</small>
-                                <br> expired on <span class="font-mono font-bold">{{ stock.expiration_date }}</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Expiring -->
-                <div v-if="expiringStocks.length" class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6 shadow-md">
-                    <h2 class="flex items-center text-xl font-bold text-yellow-800 mb-3">
-                        <span class="mr-2 text-2xl">📅</span> Expiring Soon ({{ expiringStocks.length }})
-                    </h2>
-                    <ul class="text-sm text-yellow-700 space-y-2">
-                        <li v-for="stock in expiringStocks" :key="stock.id" class="flex items-start">
-                            <span class="text-lg mr-2">•</span>
-                            <div>
-                                <span class="font-semibold">{{ stock.stockable.name }}</span>
-                                <small class="italic text-xs">(Batch: {{ stock.batch_number }})</small>
-                                <br> expires on <span class="font-mono font-bold">{{ stock.expiration_date }}</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Low Stock -->
-                <div v-if="lowStocks.length" class="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-6 shadow-md">
-                    <h2 class="flex items-center text-xl font-bold text-orange-800 mb-3">
-                        <span class="mr-2 text-2xl">📦</span> Low Stock Batches ({{ lowStocks.length }})
-                    </h2>
-                    <ul class="text-sm text-orange-700 space-y-2">
-                        <li v-for="stock in lowStocks" :key="stock.id" class="flex items-start">
-                            <span class="text-lg mr-2">•</span>
-                            <div>
-                                <span class="font-semibold">{{ stock.stockable.name }}</span>
-                                <small class="italic text-xs">(Batch: {{ stock.batch_number }})</small>
-                                <br> has only <span class="font-mono font-bold">{{ stock.quantity }}</span> left
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- Sales Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" v-if="sales">
-                <!-- Line Chart -->
-                <div class="bg-white rounded-3xl p-6 shadow-lg">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-5 border-b pb-3">Sales Over Time</h2>
-                    <div class="w-full h-80 lg:h-96">
-                        <LineChart :key="'sales-line-chart'" :data="salesLineData" :options="chartOptions" />
-                    </div>
-                </div>
-
-                <!-- Bar Chart -->
-                <div class="bg-white rounded-3xl p-6 shadow-lg">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-5 border-b pb-3">Top Products</h2>
-                    <div class="w-full h-80 lg:h-96">
-                        <BarChart :key="'sales-bar-chart'" :data="salesBarData" :options="chartOptions" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Access + Recent Activity -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 mt-4">
-                <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-lg">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-5 border-b pb-3">Quick Access</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <Link
-                            v-for="link in quickLinks"
-                            :key="link.title"
-                            :href="link.href"
-                            class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-700 font-medium shadow transition-all duration-300 transform hover:scale-105"
-                        >
-                            <component :is="link.icon" class="w-10 h-10 mb-2 text-blue-600" />
-                            <span class="text-sm text-center">{{ link.title }}</span>
-                        </Link>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-1 bg-white rounded-3xl p-6 shadow-lg">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-5 border-b pb-3">Recent Activity</h2>
-                    <ul class="text-gray-700 space-y-3">
-                        <li v-for="(item, index) in activity" :key="index" class="flex items-start text-sm">
-                            <span class="text-blue-500 font-bold text-lg leading-none mr-2">•</span>
-                            <span>{{ item }}</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-
-        </div>
-    </AppLayout>
-</template>
-
 <script setup>
-import AppLayout from '@/layouts/AppLayout.vue'
-import { Head, Link, usePage } from '@inertiajs/vue3'
-import { Users, FileBarChart2, UserPlus, ClipboardList } from 'lucide-vue-next'
-import { computed } from 'vue'
+import { ref, onMounted } from "vue";
+import Chart from "chart.js/auto";
+import AppLayout from "@/layouts/AppLayout.vue";
+import { Head } from "@inertiajs/vue3";
 
-import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, BarElement, CategoryScale, LinearScale, PointElement } from 'chart.js'
-import { Line as LineChart, Bar as BarChart } from 'vue-chartjs'
-
-// Register Chart.js components
-ChartJS.register(Title, Tooltip, Legend, LineElement, BarElement, CategoryScale, LinearScale, PointElement)
-
-// Props
 const props = defineProps({
-    stats: Object,
-    activity: Array,
-    user: Object,
-    expiredStocks: Array,
-    expiringStocks: Array,
-    lowStocks: Array,
-    sales: Object,
-})
+  userName: { type: String, required: true },
+  userRole: { type: String, required: true },
+  dailyQuote: { type: String, required: true },
 
-const page = usePage() // For quote
+  expiredItems: { type: Array, default: () => [] },
+  expiringItems: { type: Array, default: () => [] },
+  lowStockItems: { type: Array, default: () => [] },
 
-// Computed chart data
-const salesLineData = computed(() => {
-    if (!props.sales || !props.sales.labels || !props.sales.values) {
-        return { labels: [], datasets: [] }
-    }
-    return {
-        labels: props.sales.labels,
-        datasets: [
-            {
-                label: 'Sales',
-                data: props.sales.values,
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59,130,246,0.2)',
-                tension: 0.4,
-                fill: true,
-            },
-        ],
-    }
-})
+  metrics: {
+    type: Object,
+    default: () => ({
+      systemHealth: 75,
+      activeUsers: 0,
+      revenue: 0,
+      orders: 0,
+    }),
+  },
 
-const salesBarData = computed(() => {
-    if (!props.sales || !props.sales.topProducts || !props.sales.topProducts.labels || !props.sales.topProducts.values) {
-        return { labels: [], datasets: [] }
-    }
-    return {
-        labels: props.sales.topProducts.labels,
-        datasets: [
-            {
-                label: 'Units Sold',
-                data: props.sales.topProducts.values,
-                backgroundColor: '#6366f1',
-            },
-        ],
-    }
-})
+  salesChartData: { type: Object, required: true },
+  productsChartData: { type: Object, required: true },
 
-const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: true } },
-    scales: { y: { beginAtZero: true } },
-}
+  activities: { type: Array, default: () => [] },
+});
 
-const quickLinks = [
-    { title: 'Manage Users', href: '/users', icon: Users },
-    { title: 'Add New Doctor', href: '/doctors/create', icon: UserPlus },
-    { title: 'System Reports', href: '/reports', icon: FileBarChart2 },
-    { title: 'Audit Logs', href: '/users/activity-logs', icon: ClipboardList },
-]
+const currentTime = ref("");
 
-const breadcrumb = [{ title: 'Admin Dashboard', href: '/admin/dashboard' }]
+onMounted(() => {
+  setInterval(() => {
+    const now = new Date();
+    currentTime.value = now.toLocaleTimeString();
+  }, 1000);
+
+  // Sales chart
+  new Chart(document.getElementById("salesChart"), {
+    type: "line",
+    data: props.salesChartData,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: "#1f2937" } },
+      },
+    },
+  });
+
+  // Products chart
+  new Chart(document.getElementById("productsChart"), {
+    type: "bar",
+    data: props.productsChartData,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: "#1f2937" } },
+      },
+      scales: {
+        x: { ticks: { color: "#374151" } },
+        y: { ticks: { color: "#374151" } },
+      },
+    },
+  });
+});
 </script>
+
+<template>
+  <AppLayout>
+    <Head title="Admin Dashboard" />
+    <div class="relative z-10 p-6">
+      <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div
+          class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white rounded-3xl p-6 mb-6 shadow-lg"
+        >
+          <div
+            class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0"
+          >
+            <div class="flex items-center space-x-4">
+              <div
+                class="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md"
+              >
+                AD
+              </div>
+              <div>
+                <h1 class="text-3xl font-bold mb-1">
+                  Welcome back, {{ userName }}
+                </h1>
+                <p class="text-blue-100 text-lg">
+                  {{ userRole }} Dashboard
+                </p>
+              </div>
+            </div>
+
+            <!-- Search + Time -->
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <input
+                  type="text"
+                  placeholder="Quick search..."
+                  class="bg-white/30 text-white placeholder-white/70 rounded-2xl px-6 py-3 w-64 backdrop-blur-lg border border-white/40 focus:outline-none focus:ring-2 focus:ring-white/60 transition-all"
+                />
+              </div>
+              <div
+                class="bg-white/30 rounded-2xl px-6 py-3 backdrop-blur-lg border border-white/40"
+              >
+                <div class="time-display text-lg font-semibold">
+                  {{ currentTime }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quote -->
+        <div
+          class="card p-6 mb-8 glow-on-hover bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg"
+        >
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shadow-lg text-xl"
+            >
+              💡
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold mb-1">Quote of the Day</h3>
+              <p class="italic">{{ dailyQuote }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div
+            class="card p-6 border-l-4 border-red-600 bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg"
+          >
+            <h3 class="text-lg font-bold mb-2">
+              Expired Items ({{ expiredItems.length }})
+            </h3>
+            <ul class="space-y-1 max-h-40 overflow-y-auto">
+              <li v-for="(item, i) in expiredItems" :key="i" class="text-sm">
+                {{ item.stockable.name }} – {{ item.batch }} (Expired on: {{ item.expiration_date }})
+              </li>
+            </ul>
+          </div>
+
+          <div
+            class="card p-6 border-l-4 border-yellow-500 bg-gradient-to-br from-yellow-400 to-amber-500 text-white shadow-lg"
+          >
+            <h3 class="text-lg font-bold mb-2">
+              Expiring Soon ({{ expiringItems.length }})
+            </h3>
+            <ul class="space-y-1 max-h-40 overflow-y-auto">
+              <li v-for="(item, i) in expiringItems" :key="i" class="text-sm">
+                {{ item.stockable.name }} – {{ item.batch }} ({{ item.expiration_date }})
+              </li>
+            </ul>
+          </div>
+
+          <div
+            class="card p-6 border-l-4 border-orange-600 bg-gradient-to-br from-orange-500 to-pink-500 text-white shadow-lg"
+          >
+            <h3 class="text-lg font-bold mb-2">
+              Low Stock ({{ lowStockItems.length }})
+            </h3>
+            <ul class="space-y-1 max-h-40 overflow-y-auto">
+              <li v-for="(item, i) in lowStockItems" :key="i" class="text-sm">
+                {{ item.name }} – {{ item.batch }} (Qty: {{ item.quantity }}/{{
+                  item.minimum
+                }})
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div
+            class="metric-card p-6 rounded-3xl text-center bg-gradient-to-br from-green-400 to-green-600 text-white shadow-md"
+          >
+            <div class="text-2xl font-bold">{{ metrics.systemHealth }}%</div>
+            <p>System Health</p>
+          </div>
+          <div
+            class="metric-card p-6 rounded-3xl text-center bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md"
+          >
+            <div class="text-2xl font-bold">{{ metrics.activeUsers }}</div>
+            <p>Active Users</p>
+          </div>
+          <div
+            class="metric-card p-6 rounded-3xl text-center bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-md"
+          >
+            <div class="text-2xl font-bold">{{ metrics.revenue }}</div>
+            <p>Revenue</p>
+          </div>
+          <div
+            class="metric-card p-6 rounded-3xl text-center bg-gradient-to-br from-pink-400 to-pink-600 text-white shadow-md"
+          >
+            <div class="text-2xl font-bold">{{ metrics.orders }}</div>
+            <p>Orders</p>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div class="card p-6 shadow-lg">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">
+              Sales Analytics
+            </h2>
+            <canvas id="salesChart"></canvas>
+          </div>
+          <div class="card p-6 shadow-lg">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">
+              Top Products
+            </h2>
+            <canvas id="productsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card p-6 shadow-lg bg-gradient-to-br from-gray-50 to-gray-100">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">
+            Recent Activity
+          </h2>
+          <div class="space-y-2">
+            <div
+              v-for="(a, i) in activities"
+              :key="i"
+              class="activity-item text-sm text-gray-700"
+            >
+              {{ a }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </AppLayout>
+</template>

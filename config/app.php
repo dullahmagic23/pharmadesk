@@ -105,6 +105,14 @@ return [
         ),
     ],
 
+    'licence' => [
+        'key' => env('LICENSE_KEY', ''),
+        'client' => env('LICENCE_CLIENT_NAME', ''),
+        'server_url' => env('LICENSE_SERVER_URL', 'https://license.example.com'),
+        'application' => env('LICENSE_APPLICATION', 'pharmadesk'),
+        'app_version' => env('LICENCE_APPLICATION_VERSION', '1.0.0'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver
@@ -122,5 +130,13 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+    'providers' => \Illuminate\Support\ServiceProvider::defaultProviders()->merge([
+        // Package Service Providers...
+    ])->replace([
+                \Illuminate\Queue\QueueServiceProvider::class => \Gecche\Multidomain\Queue\QueueServiceProvider::class,
+            ])->merge([
+                // Added Service Providers (Do not remove this line)...
+            ])->toArray(),
+        ];
 
-];
+

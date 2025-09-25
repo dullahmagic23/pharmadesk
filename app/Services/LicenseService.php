@@ -23,9 +23,13 @@ class LicenseService
 
     public function verify(): bool
     {
+        if(!$this->checkInternetConnection()) {
+            abort(403,"The system needs to perform a licence verification,
+            Please connect to the internet and try again");
+        }
         // Optional: use cache for offline tolerance
         $cached = Cache::get('license_verified_at');
-        if ($cached && now()->diffInHours($cached) < 24) {
+        if ($cached && now()->diffInHours($cached) < (24*30)) {
             return true;
         }
 
@@ -38,7 +42,7 @@ class LicenseService
 //        return $response;
 
         if ($response->ok() && $response->json('status') === 'active') {
-            Cache::put('license_verified_at', now(), 24 * 60); // cache 24h
+            Cache::put('license_verified_at', now(), 30*24 * 60); // cache 30 days
             return true;
         }
 
@@ -62,5 +66,20 @@ class LicenseService
     {
         // Generate a unique machine ID. Example: hostname or MAC
         return md5(gethostname() . php_uname());
+    }
+
+    //function to check for internet connection
+    private function checkInternetConnection()
+    {
+        try{
+            $response = @fsockopen("www.google.com", 80, $errno, $errstr, 5);
+            if ($response) {
+                fclose($response);
+                return true;
+            }
+            return false;
+        } catch( \Exception $e){
+
+        }
     }
 }

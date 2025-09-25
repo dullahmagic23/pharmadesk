@@ -12,6 +12,7 @@ use App\Models\Activity;
 use App\Models\Patient;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -30,7 +31,6 @@ class AdminDashboardController extends Controller
                 ->limit(7)
                 ->pluck('total', 'day');
         } else {
-            // SQLite
             $salesOverTime = Sale::selectRaw("strftime('%Y-%m-%d', created_at) as day, SUM(total) as total")
                 ->groupBy('day')
                 ->orderBy('day')
@@ -38,18 +38,24 @@ class AdminDashboardController extends Controller
                 ->pluck('total', 'day');
         }
 
-        // Format line chart data
-        $salesLine = [
+        $salesChartData = [
             'labels' => $salesOverTime->keys(),
-            'values' => $salesOverTime->values(),
+            'datasets' => [
+                [
+                    'label' => 'Sales',
+                    'data' => $salesOverTime->values(),
+                    'fill' => false,
+                    'borderColor' => '#3b82f6',
+                    'tension' => 0.1,
+                ]
+            ],
         ];
 
-        // ----- Top Products (by units sold) ----
-// Get top 5 sellables by quantity sold
+        // ----- Top Products -----
         $topProducts = SaleItem::with('sellable:id,name')
             ->get()
             ->groupBy('sellable_id')
-            ->map(function ($items, $sellableId) {
+            ->map(function ($items) {
                 return [
                     'name' => $items->first()->sellable->name ?? 'Unknown',
                     'total' => $items->sum('quantity'),
@@ -57,31 +63,45 @@ class AdminDashboardController extends Controller
             })
             ->sortByDesc('total')
             ->take(5)
-            ->values(); // reset keys
+            ->values();
 
-        $salesBar = [
+        $productsChartData = [
             'labels' => $topProducts->pluck('name'),
-            'values' => $topProducts->pluck('total'),
+            'datasets' => [
+                [
+                    'label' => 'Units Sold',
+                    'data' => $topProducts->pluck('total'),
+                    'backgroundColor' => '#10b981',
+                ]
+            ],
         ];
 
+        // ----- Recent Activity -----
+        $activities = Activity::latest()
+            ->take(5)
+            ->get(['id', 'description', 'created_at'])
+            ->map(fn($a) => $a->description . ' (' . $a->created_at->diffForHumans() . ')');
 
         return Inertia::render('Admin/Dashboard', [
-            'stats' => [
-                'doctors' => User::role('doctor')->count(),
-                'pharmacists' => User::role('pharmacist')->count(),
-                'patients' => Patient::count(),
-            ],
-            'activity' => Activity::latest()->take(5)->pluck('description'),
-            'user' => auth()->user()->load('roles'),
-            'expiredStocks' => $expiredItems['expired'],
-            'expiringStocks' => $expiredItems['expiring'],
-            'lowStocks' => $lowStocks,
+            'userName' => Auth::user()->name,
+            'userRole' => Auth::user()->roles->pluck('name')->implode(', '),
+            'dailyQuote' => 'Excellence is not an act but a habit.', // placeholder, can randomize
 
-            'sales' => [
-                'labels' => $salesLine['labels'],
-                'values' => $salesLine['values'],
-                'topProducts' => $salesBar,
+            'expiredItems' => $expiredItems['expired'],
+            'expiringItems' => $expiredItems['expiring'],
+            'lowStockItems' => $lowStocks,
+
+            'metrics' => [
+                'systemHealth' => 75,
+                'activeUsers' => User::count(),
+                'revenue' => Sale::sum('total'),
+                'orders' => Sale::count(),
             ],
+
+            'salesChartData' => $salesChartData,
+            'productsChartData' => $productsChartData,
+            'activities' => $activities,
         ]);
     }
+
 }

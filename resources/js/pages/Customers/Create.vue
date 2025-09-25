@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import {Input} from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import InputError from '@/components/InputError.vue';
 
 const form = useForm({
     name: '',
@@ -14,7 +15,9 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.post('/customers')
+    form.post('/customers',{
+        onSuccess: () => form.reset()
+    })
 }
 </script>
 
@@ -27,22 +30,25 @@ const submit = () => {
                 <div>
                     <Label for="name">Name</Label>
                     <Input v-model="form.name" class="Input" />
-                    <div v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</div>
+                    <InputError :message="form.errors.name" class="mt-2" />
                 </div>
 
                 <div>
                     <Label for="phone">Phone</Label>
-                    <Input v-model="form.phone" class="Input" />
+                    <Input type="tel" v-model="form.phone" class="Input" />
+                    <InputError :message="form.errors.phone" class="mt-2" />
                 </div>
 
                 <div>
                     <Label for="email">Email</Label>
-                    <Input v-model="form.email" class="Input" />
+                    <Input type="email" v-model="form.email" class="Input" />
+                    <InputError :message="form.errors.email" class="mt-2" />
                 </div>
 
                 <div>
                     <Label for="address">Address</Label>
                     <Textarea v-model="form.address" class="Input"></Textarea>
+                    <InputError :message="form.errors.address" class="mt-2" />
                 </div>
 
                 <Button type="submit" class="btn btn-primary">Save</Button>
