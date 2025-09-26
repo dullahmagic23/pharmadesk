@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ApiCustomerController extends Controller
 {
@@ -23,5 +24,11 @@ class ApiCustomerController extends Controller
 
         $customer = Customer::create($request->all());
         return response()->json($customer, 201);
+    }
+
+    public function show(Customer $customer)
+    {
+        return Inertia::render('Customers/Show', [
+            'customer' => $customer->load('sales.items.sellable')]);
     }
 }

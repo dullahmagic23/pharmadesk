@@ -83,6 +83,9 @@ const breadcrumbs = [
                                 <Link :href="`/medicines/${medicine.id}/edit`">
                                 <Button>Edit</Button>
                                 </Link>
+                                <Link :href="`/medicines/${medicine.id}`">
+                                <Button class="ml-2">View</Button>
+                                </Link>
                             </td>
                         </tr>
                     </tbody>

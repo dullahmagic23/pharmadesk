@@ -3,6 +3,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
@@ -10,6 +11,26 @@ class Medicine extends Model
 {
     use LogsActivity;
     use HasFactory;
+    use Searchable;
+
+     public function toSearchableArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'sku' => $this->sku,
+            'price' => $this->price,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'medicines_index';
+    }
+
+    public function path(): string
+    {
+        return route('medicines.show', $this->id);
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

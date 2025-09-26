@@ -12,5 +12,6 @@ Route::get('/user', function (Request $request) {
 
 //Customer api routes
 
-Route::resource('customers', ApiCustomerController::class);
+Route::get('/customers', [ApiCustomerController::class, 'index'])->name('api.customers.index');
+Route::post('/customers', [ApiCustomerController::class, 'store'])->name('api.customers.store');
 Route::get('/sales/{sale}', [ApiSalesController::class,'destroy']);

@@ -46,7 +46,9 @@ class SaleController extends Controller
     public function create()
     {
         // Fetch the customers
-        $customers = Customer::select('id', 'name')->get();
+        $customers = Customer::select('id', 'name')
+                                ->orderBy('created_at','asc')
+                                ->get();
 
         // Fetch the stocks, ordered by stockable name (assuming you want to sort by `name` of stockable)
         $stocks = Stock::with(['stockable', 'unit'])
@@ -64,6 +66,7 @@ class SaleController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $validated = $request->validate([
             'customer_id' => 'required|uuid|exists:customers,id',
             'items' => 'required|array|min:1',

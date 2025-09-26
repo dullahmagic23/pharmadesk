@@ -40,6 +40,14 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Product created successfully.');
     }
 
+    public function show($id)
+    {
+        $product = Product::findOrFail($id);
+        return Inertia::render('Products/Show', [
+            'product' => $product->load('saleItems','stock'),
+        ]);
+    }
+
     public function edit($id)
     {
         $product = Product::findOrFail($id);

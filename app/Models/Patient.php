@@ -37,4 +37,9 @@ class Patient extends Model
     {
         return "{$this->first_name} {$this->last_name}";
     }
+
+    public function sales()
+    {
+        return $this->morphMany(Sale::class, 'buyer');
+    }
 }

@@ -38,9 +38,11 @@ class CustomerController extends Controller
         return redirect()->back()->with('success', 'Customer created successfully.');
     }
 
-    public function show(Customer $customer)
+     public function show(Customer $customer)
     {
-        return Inertia::render('Customers/Show', compact('customer'));
+        return Inertia::render('Customers/Show', [
+            'customer' => $customer->load('sales.items.sellable','sales.payments'),
+        ]);
     }
 
     public function edit(Customer $customer)

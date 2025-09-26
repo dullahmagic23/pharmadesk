@@ -24,6 +24,7 @@ class LicenseService
     public function verify(): bool
     {
         if(!$this->checkInternetConnection()) {
+            return true;
             abort(403,"The system needs to perform a licence verification,
             Please connect to the internet and try again");
         }

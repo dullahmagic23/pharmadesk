@@ -233,6 +233,8 @@ const medicalItems = [
         icon: ChartBar,
         children: [
             { title: 'Sales Report', href: '/reports/sales', icon: FileImageIcon },
+            {title: 'Medicine Report', href:'/reports/medicines', icon:FileImageIcon},
+            {title:'Product Report', href:'/reports/products', icon:FileImageIcon},
             // { title: 'Customers Report', href: '/reports/sales', icon: FileImageIcon },
             // { title: 'Inventory Report', href: '/reports/sales', icon: FileImageIcon },
             // { title: 'Stock Report', href: '/reports/sales', icon: FileImageIcon },

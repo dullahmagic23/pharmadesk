@@ -75,7 +75,7 @@ class MedicineController extends Controller
     public function show(Medicine $medicine)
     {
         return Inertia::render('Medicines/Show', [
-            'medicine' => $medicine
+            'medicine' => $medicine->load(['stock','saleItems','category:id,name', 'units:id,unit_name']),
         ]);
     }
 

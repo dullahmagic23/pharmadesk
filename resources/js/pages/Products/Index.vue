@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router,Link } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import FlashMessage from '@/components/FlashMessage.vue'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-vue-next'
 
 const props = defineProps({
   products: Array,
@@ -80,6 +80,11 @@ const breadcrumbs = [
                   <Button size="sm" variant="outline" @click="$inertia.visit(route('products.edit', product.id))">
                     <PencilIcon class="w-4 h-4" />
                   </Button>
+                  <Link :href="`/products/${product.id}`">
+                    <Button size="sm" variant="outline">
+                      <EyeIcon class="w-4 h-4" />
+                    </Button>
+                  </Link>
                   <Button size="sm" variant="destructive" @click="deleteProduct(product.id)">
                     <TrashIcon class="w-4 h-4" />
                   </Button>

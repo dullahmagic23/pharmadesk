@@ -154,37 +154,52 @@ function formatDate(dateStr) {
     return new Date(dateStr).toLocaleDateString()
 }
 
-// CSV Export
-function exportToCSV() {
-    const headers = ['#', 'Item', 'Type', 'Quantity', 'Purchase cost', 'Selling cost', 'Profit', 'Date']
-    const rows = flattenedItems.value.map((item, index) => [
-        index + 1,
-        item.sellable?.name || '—',
-        readableType(item.sellable_type),
-        item.quantity,
-        currency(item.sellable?.stock?.buying_price * item.quantity),
-        currency(item.price * item.quantity),
-        currency((item.price * item.quantity) - (item.sellable?.stock?.buying_price * item.quantity)),
-        formatDate(item.created_at)
-    ])
+const currencyValue = (value) => {
+  return Number(value ?? 0).toFixed(2); // raw number, 2 decimals
+}
 
-    // Add summary row
-    rows.push([])
-    rows.push(['', '', '', '', 'Total Sales', currency(totalSales.value), 'Total Profit', currency(totalProfit.value)])
+function exportToCSV() {
+    const headers = ['#', 'Item', 'Type', 'Quantity', 'Purchase cost', 'Selling cost', 'Profit', 'Date'];
+
+    const rows = flattenedItems.value.map((item, index) => {
+        const purchase = item.sellable?.stock?.buying_price * item.quantity || 0;
+        const selling = item.price * item.quantity;
+        const profit = selling - purchase;
+
+        return [
+            index + 1,
+            item.sellable?.name || '—',
+            readableType(item.sellable_type),
+            item.quantity,
+            currencyValue(purchase),
+            currencyValue(selling),
+            currencyValue(profit),
+            formatDate(item.created_at)
+        ];
+    });
+
+    // Summary row
+    rows.push([]);
+    rows.push([
+        '', '', '', '',
+        'Total Sales', currencyValue(totalSales.value),
+        'Total Profit', currencyValue(totalProfit.value)
+    ]);
 
     const csvContent = [headers, ...rows]
         .map(row => row.map(cell => `"${cell}"`).join(','))
-        .join('\n')
+        .join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', 'sales_report.csv')
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'sales_report.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
+
 
 // PDF Export
 function exportToPDF() {

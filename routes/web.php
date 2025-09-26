@@ -33,6 +33,7 @@ use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\StockConversionController;
 use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SearchController;
 
 require __DIR__ . '/auth.php';
 
@@ -77,6 +78,8 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
         Route::get('/prescriptions/{prescription}/download', [PrescriptionController::class, 'download'])->name('prescriptions.download');
         Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('auth');
         Route::get('/reports/purchases', [ReportController::class, 'purchaseReport'])->name('reports.purchases')->middleware('auth');
+        Route::get('/reports/medicines', [ReportController::class, 'medicineReport'])->name('reports.medicines')->middleware('auth');
+        Route::get('/reports/products', [ReportController::class, 'productReport'])->name('reports.products')->middleware('auth');
         Route::get('/reports/stock', [StockReportController::class, 'index'])->name('reports.stocks')->middleware('auth');
         Route::get('/reports', fn() => Inertia::render('Reports/Index'))->name('reports.index');
         Route::get('/reports/purchases/pdf', [PurchaseReportController::class, 'exportPdf'])->name('reports.purchases.pdf');
@@ -101,4 +104,18 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
 });
 Route::get('/license',[LicenseCheckController::class,'index'])->name('license.index');
 Route::get('/license-check',[LicenseCheckController::class,'index'])->name('license.check');
+Route::get('/search', [SearchController::class,'search'])
+    ->name('search');
+    Route::get('/search', [SearchController::class, 'search'])->name('search.basic');
+
+// Advanced search with filters
+Route::get('/search/advanced', [SearchController::class, 'advancedSearch'])->name('search.advanced');
+
+// Search suggestions for autocomplete
+Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+
+// Admin route to clear search cache (optional)
+Route::delete('/search/cache', [SearchController::class, 'clearCache'])
+    ->name('search.clear-cache')
+    ->middleware(['auth', 'admin']); // Add appropriate middleware
 

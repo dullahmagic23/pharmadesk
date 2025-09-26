@@ -233,8 +233,8 @@
                                 type="number"
                                 v-model.number="form.paid"
                                 min="0"
+                                :max="form.total"
                                 class="text-xl font-bold text-green-700 mt-1"
-                                :value="form.total.toFixed(2)"
                             />
                         </div>
 

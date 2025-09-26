@@ -3,8 +3,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Stock;
+use Elastic\ScoutDriverPlus\Searchable;
+
 class Product extends Model
 {
+    use Searchable;
+
+     public function toSearchableArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'sku' => $this->sku,
+            'price' => $this->price,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'products_index';
+    }
+
+    public function path(): string
+    {
+        return route('products.show', $this->id);
+    }
     public $incrementing = false;
     protected $keyType = 'string';
 
