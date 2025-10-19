@@ -85,6 +85,7 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
         Route::get('/reports/purchases/pdf', [PurchaseReportController::class, 'exportPdf'])->name('reports.purchases.pdf');
         Route::resource('users', UserController::class)->middleware('auth');
         Route::resource('roles', RoleController::class);
+        Route::resource('sales-payments',SalePaymentController::class)->middleware('auth')->name('sales-payments','sales-payments');
     });
 
     Route::get('/sales/{sale}/receipt',[SaleController::class,'printReceipt'])->name('sales.receipt')->middleware('auth');

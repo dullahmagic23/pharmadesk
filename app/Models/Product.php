@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Stock;
@@ -7,7 +8,8 @@ use Elastic\ScoutDriverPlus\Searchable;
 
 class Product extends Model
 {
-    use Searchable;
+    use HasUuid;
+//    use Searchable;
 
      public function toSearchableArray(): array
     {

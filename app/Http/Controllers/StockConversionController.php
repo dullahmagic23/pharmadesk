@@ -62,6 +62,9 @@ class StockConversionController extends Controller
                 $stock->expiration_date = $affected_stock->expiration_date;
                 $stock->batch_number = $affected_stock->batch_number;
                 $stock->location_id = $affected_stock->location_id;
+                $stock->batch_number = $affected_stock->batch_number;
+                $stock->expiration_date = $affected_stock->expiration_date;
+                $stock->buying_price = $affected_stock->buying_price/$converted;
                 $stock->save();
             } else {
                 $stock = Stock::create([

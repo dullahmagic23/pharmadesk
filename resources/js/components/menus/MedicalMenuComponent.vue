@@ -25,6 +25,7 @@ import {
     UsersIcon,
     UserPlus2Icon,
     PlusSquare,
+    DollarSignIcon,
 } from 'lucide-vue-next';
 
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup } from '@/components/ui/dropdown-menu';
@@ -53,7 +54,8 @@ const medicalItems = [
         children: [
             { title: 'New Sale', href: '/sales/create', icon: PlusCircleIcon },
             { title: 'Manage Sales', href: '/sales', icon: ListFilter },
-            {title:'Receipts',href:'/receipts',icon:FileTextIcon},
+            { title: 'Payments', href: '/sales-payments', icon: DollarSignIcon },
+            { title: 'Receipts', href: '/receipts', icon: FileTextIcon },
         ],
     },
 

@@ -217,4 +217,8 @@ return [
         ],
     ],
 
+    'relations' => [
+        'sync' => false,
+    ],
+
 ];

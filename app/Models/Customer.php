@@ -11,9 +11,9 @@ class Customer extends Model
 {
     use HasFactory;
     use HasUuid;
-    use Searchable;
-
-    use Searchable;
+//    use Searchable;
+//
+//    use Searchable;
 
      public function toSearchableArray(): array
     {

@@ -106,10 +106,12 @@ class SaleController extends Controller
                 'reference' => 'RCT-'.mt_rand(100000, 999999),
             ]);
 
-            $sale->payments()->create([
-                'amount' => $validated['paid'],
-                'paid_at' => now(),
-            ]);
+            if ($validated['paid'] > 0) {
+                $sale->payments()->create([
+                    'amount' => $validated['paid'],
+                    'paid_at' => now(),
+                ]);
+            }
 
 
 
@@ -161,19 +163,33 @@ class SaleController extends Controller
     public function printReceipt(Sale $sale)
     {
         $receipt = $sale->receipt;
-        $receipt->load(['sale.buyer', 'sale.payments','sale.items.sellable']);
+        $receipt->load(['sale', 'sale.buyer', 'sale.payments', 'sale.items.sellable']);
+        return view('receipts.thermal', compact('receipt'));
+    }
 
-        $pdf = Pdf::loadView('receipts.show', compact('receipt'))
-            ->setPaper([0, 0, 226.77, 420]); // 8cm x 29.7cm in points
+    public function destroy(Sale $sale)
+    {
+        DB::transaction(function () use ($sale) {
+            // Restore stock quantities
+            foreach ($sale->items as $item) {
+                $stock = $item->stock;
+                if ($stock) {
+                    $stock->increment('quantity', $item->quantity);
+                }
+            }
 
-        return response($pdf->output(), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "inline; filename=Receipt-{$receipt->reference}.pdf",
-            'X-Content-Type-Options' => 'nosniff',
-            'X-Frame-Options' => 'SAMEORIGIN',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-        ]);
+            // Delete related records
+            $sale->items()->delete();
+            $sale->payments()->delete();
+            if ($sale->receipt) {
+                $sale->receipt->delete();
+            }
+
+            // Delete the sale
+            $sale->delete();
+        });
+
+        return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
     }
 
 

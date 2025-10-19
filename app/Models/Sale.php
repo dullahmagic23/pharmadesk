@@ -12,7 +12,7 @@ class Sale extends Model
     public $incrementing = false;
 
     protected $fillable = ['buyer_id', 'buyer_type', 'total', 'paid', 'balance', 'date','user_id','customer_id'];
-    protected $appends = ['type'];
+    protected $appends = ['type','status'];
 
 
     public function buyer()
@@ -47,6 +47,17 @@ class Sale extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getStatusAttribute()
+    {
+        if ($this->balance <= 0) {
+            return 'paid';
+        } elseif ($this->paid > 0 && $this->balance > 0) {
+            return 'partial';
+        } else {
+            return 'unpaid';
+        }
     }
 
 }

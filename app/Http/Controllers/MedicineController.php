@@ -99,6 +99,8 @@ class MedicineController extends Controller
             'unit_ids.*' => 'exists:medicine_units,id',
         ]);
 
+//        dd($data);
+
         $medicine->update([
             'name' => $data['name'],
             'brand' => $data['brand'],

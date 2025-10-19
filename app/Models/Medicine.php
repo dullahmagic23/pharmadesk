@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,9 +12,11 @@ class Medicine extends Model
 {
     use LogsActivity;
     use HasFactory;
-    use Searchable;
+//    use Searchable;
+    use HasUuid;
 
-     public function toSearchableArray(): array
+
+    public function toSearchableArray(): array
     {
         return [
             'name' => $this->name,
@@ -54,8 +57,11 @@ class Medicine extends Model
     // Generate UUID for new records
     protected static function booted()
     {
-        static::creating(function ($model) {
-            $model->id = (string) Str::uuid(); // Automatically assign UUID when creating a record
+        parent::booted();
+        static::updated(function ($model) {
+            if (method_exists($model, 'searchable')) {
+                $model->searchable();
+            }
         });
     }
 
