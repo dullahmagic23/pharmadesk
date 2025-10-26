@@ -1,81 +1,159 @@
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Sales Report" />
-        <div class="p-6 bg-white rounded-xl shadow space-y-6">
-            <!-- Filters -->
-            <div class="flex justify-end space-x-4">
-                <Input v-model="filters.from" type="date" placeholder="From" />
-                <Input v-model="filters.to" type="date" placeholder="To" />
-                <Button variant="destructive" @click="clearFilters">
-                    <DeleteIcon class="w-5 h-5" />
-                    Clear filters
-                </Button>
+        <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-slate-900">Sales Report</h1>
+                <p class="text-slate-600 mt-1">Track and analyze your sales performance</p>
             </div>
 
-            <!-- Totals -->
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="space-y-1 text-lg font-semibold text-gray-700">
-                    <div>
-                        Total Sales:
-                        <span class="text-green-600">
-                            {{ currency(totalSales) }}
-                        </span>
-                    </div>
-                    <div>
-                        Total Profit:
-                        <span class="text-blue-600">
-                            {{ currency(totalProfit) }}
-                        </span>
+            <!-- Main Content -->
+            <div class="space-y-6">
+                <!-- Filters Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                        <div class="flex flex-col sm:flex-row gap-3 flex-1">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">From</label>
+                                <Input v-model="filters.from" type="date" class="w-full" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">To</label>
+                                <Input v-model="filters.to" type="date" class="w-full" />
+                            </div>
+                        </div>
+                        <Button
+                            variant="outline"
+                            @click="clearFilters"
+                            class="flex items-center justify-center gap-2"
+                        >
+                            <DeleteIcon class="w-4 h-4" />
+                            Clear
+                        </Button>
                     </div>
                 </div>
-                <div class="flex flex-wrap justify-center md:justify-end space-x-2">
-                    <Button @click="exportToCSV" variant="outline" class="flex items-center space-x-2">
-                        <DownloadIcon class="w-5 h-5" />
-                        <span>Export to CSV</span>
-                    </Button>
-                    <Button @click="exportToPDF" variant="outline" class="flex items-center space-x-2">
-                        <FileTextIcon class="w-5 h-5" />
-                        <span>Export to PDF</span>
-                    </Button>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <StatCard
+                        title="Total Sales"
+                        :value="currency(totalSales)"
+                        icon="TrendingUp"
+                        color="blue"
+                    />
+                    <StatCard
+                        title="Total Profit"
+                        :value="currency(totalProfit)"
+                        icon="DollarSign"
+                        color="green"
+                    />
+                    <StatCard
+                        title="Items Sold"
+                        :value="flattenedItems.length"
+                        icon="ShoppingCart"
+                        color="purple"
+                    />
                 </div>
-            </div>
 
-            <!-- Sales Table -->
-            <div v-if="flattenedItems.length" class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="border-b">
-                        <tr class="text-left">
-                            <th class="px-4 py-2">#</th>
-                            <th class="px-4 py-2">Item</th>
-                            <th class="px-4 py-2">Type</th>
-                            <th class="px-4 py-2">Quantity</th>
-                            <th class="px-4 py-2">Purchase cost</th>
-                            <th class="px-4 py-2">Selling cost</th>
-                            <th class="px-4 py-2">Profit made</th>
-                            <th class="px-4 py-2">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(item, i) in flattenedItems" :key="item.id" class="border-b hover:bg-gray-50">
-                            <td class="px-4 py-2">{{ i + 1 }}</td>
-                            <td class="px-4 py-2">{{ item.sellable?.name || '—' }}</td>
-                            <td class="px-4 py-2">{{ readableType(item.sellable_type) }}</td>
-                            <td class="px-4 py-2">{{ item.quantity }}</td>
-                            <td class="px-4 py-2">
-                                {{ currency(item.sellable?.stock?.buying_price * item.quantity) }}
-                            </td>
-                            <td class="px-4 py-2">{{ currency(item.price * item.quantity) }}</td>
-                            <td class="px-4 py-2">
-                                {{ currency((item.price * item.quantity) - (item.sellable?.stock?.buying_price * item.quantity)) }}
-                            </td>
-                            <td class="px-4 py-2">{{ formatDate(item.created_at) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                <!-- Table Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <!-- Table Header with Export -->
+                    <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <h2 class="text-lg font-semibold text-slate-900">Sales Details</h2>
+                        <div class="flex gap-2">
+                            <Button
+                                @click="exportToCSV"
+                                variant="outline"
+                                class="flex items-center gap-2"
+                            >
+                                <DownloadIcon class="w-4 h-4" />
+                                <span class="hidden sm:inline">CSV</span>
+                            </Button>
+                            <Button
+                                @click="exportToPDF"
+                                variant="outline"
+                                class="flex items-center gap-2"
+                            >
+                                <FileTextIcon class="w-4 h-4" />
+                                <span class="hidden sm:inline">PDF</span>
+                            </Button>
+                        </div>
+                    </div>
 
-            <div v-else class="text-center text-gray-500">
-                No sales found for the selected range.
+                    <!-- Table -->
+                    <div v-if="flattenedItems.length" class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-left font-semibold text-slate-700">#</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-slate-700">Item</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-slate-700">Type</th>
+                                    <th class="px-6 py-4 text-right font-semibold text-slate-700">Qty</th>
+                                    <th class="px-6 py-4 text-right font-semibold text-slate-700">Purchase</th>
+                                    <th class="px-6 py-4 text-right font-semibold text-slate-700">Selling</th>
+                                    <th class="px-6 py-4 text-right font-semibold text-slate-700">Profit</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-slate-700">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr
+                                    v-for="(item, i) in flattenedItems"
+                                    :key="item.id"
+                                    class="hover:bg-slate-50 transition-colors"
+                                >
+                                    <td class="px-6 py-4 text-slate-900">{{ i + 1 }}</td>
+                                    <td class="px-6 py-4 font-medium text-slate-900">{{ item.sellable?.name || '—' }}</td>
+                                    <td class="px-6 py-4 text-slate-600">
+                                        <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                                            {{ readableType(item.sellable_type) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-slate-900">{{ item.quantity }}</td>
+                                    <td class="px-6 py-4 text-right text-slate-600">
+                                        {{ currency(item.sellable?.stock?.buying_price * item.quantity) }}
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-slate-900 font-medium">
+                                        {{ currency(item.price * item.quantity) }}
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <span
+                                            :class="profitClass((item.price * item.quantity) - (item.sellable?.stock?.buying_price * item.quantity))"
+                                        >
+                                            {{ currency((item.price * item.quantity) - (item.sellable?.stock?.buying_price * item.quantity)) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-600">{{ formatDate(item.created_at) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div v-else class="px-6 py-16 text-center">
+                        <ShoppingCartIcon class="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                        <p class="text-slate-500 text-lg">No sales found for the selected range</p>
+                    </div>
+
+                    <!-- Summary Footer -->
+                    <div v-if="flattenedItems.length" class="px-6 py-4 bg-slate-50 border-t border-slate-200">
+                        <div class="flex flex-col sm:flex-row sm:justify-between gap-4">
+                            <div class="flex gap-8">
+                                <div>
+                                    <p class="text-sm text-slate-600">Total Sales</p>
+                                    <p class="text-2xl font-bold text-blue-600">{{ currency(totalSales) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-slate-600">Total Profit</p>
+                                    <p class="text-2xl font-bold text-green-600">{{ currency(totalProfit) }}</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-slate-600">
+                                Profit Margin: <span class="font-semibold text-slate-900">{{ profitMargin }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </AppLayout>
@@ -88,9 +166,34 @@ import { Button } from '@/components/ui/button'
 import { ref, computed } from 'vue'
 import { usePage, Head } from '@inertiajs/vue3'
 import currency from '@/modules/currecyFormatter'
-import { DeleteIcon, DownloadIcon, FileTextIcon } from 'lucide-vue-next'
+import { DeleteIcon, DownloadIcon, FileTextIcon, ShoppingCartIcon } from 'lucide-vue-next'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+
+const StatCard = {
+    props: ['title', 'value', 'icon', 'color'],
+    template: `
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 mb-2">{{ title }}</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ value }}</p>
+                </div>
+                <div :class="['w-12 h-12 rounded-lg flex items-center justify-center', {
+                    'bg-blue-100': color === 'blue',
+                    'bg-green-100': color === 'green',
+                    'bg-purple-100': color === 'purple'
+                }]">
+                    <span :class="['text-xl', {
+                        'text-blue-600': color === 'blue',
+                        'text-green-600': color === 'green',
+                        'text-purple-600': color === 'purple'
+                    }]">📈</span>
+                </div>
+            </div>
+        </div>
+    `
+}
 
 const page = usePage()
 const sales = ref(page.props.sales || [])
@@ -100,7 +203,6 @@ function clearFilters() {
     filters.value = { from: '', to: '' }
 }
 
-// Filtered sales computed property
 const filteredSales = computed(() => {
     if (!filters.value.from && !filters.value.to) return sales.value
     return sales.value.filter(sale => {
@@ -121,7 +223,6 @@ const filteredSales = computed(() => {
     })
 })
 
-// Flatten sale items for display
 const flattenedItems = computed(() =>
     filteredSales.value.flatMap(sale =>
         (sale.items || []).map(item => ({
@@ -131,7 +232,6 @@ const flattenedItems = computed(() =>
     )
 )
 
-// Totals
 const totalSales = computed(() =>
     flattenedItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 )
@@ -146,25 +246,34 @@ const totalProfit = computed(() =>
     )
 )
 
+const profitMargin = computed(() => {
+    if (totalSales.value === 0) return 0
+    return ((totalProfit.value / totalSales.value) * 100).toFixed(1)
+})
+
 function readableType(type) {
     return type?.split('\\').pop() || 'Unknown'
 }
 
 function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString()
+    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
-const currencyValue = (value) => {
-  return Number(value ?? 0).toFixed(2); // raw number, 2 decimals
+function profitClass(profit) {
+    if (profit > 0) return 'text-green-600 font-semibold'
+    if (profit < 0) return 'text-red-600 font-semibold'
+    return 'text-slate-600'
 }
+
+const currencyValue = (value) => Number(value ?? 0).toFixed(2)
 
 function exportToCSV() {
-    const headers = ['#', 'Item', 'Type', 'Quantity', 'Purchase cost', 'Selling cost', 'Profit', 'Date'];
+    const headers = ['#', 'Item', 'Type', 'Quantity', 'Purchase cost', 'Selling cost', 'Profit', 'Date']
 
     const rows = flattenedItems.value.map((item, index) => {
-        const purchase = item.sellable?.stock?.buying_price * item.quantity || 0;
-        const selling = item.price * item.quantity;
-        const profit = selling - purchase;
+        const purchase = item.sellable?.stock?.buying_price * item.quantity || 0
+        const selling = item.price * item.quantity
+        const profit = selling - purchase
 
         return [
             index + 1,
@@ -175,36 +284,33 @@ function exportToCSV() {
             currencyValue(selling),
             currencyValue(profit),
             formatDate(item.created_at)
-        ];
-    });
+        ]
+    })
 
-    // Summary row
-    rows.push([]);
+    rows.push([])
     rows.push([
         '', '', '', '',
         'Total Sales', currencyValue(totalSales.value),
         'Total Profit', currencyValue(totalProfit.value)
-    ]);
+    ])
 
     const csvContent = [headers, ...rows]
         .map(row => row.map(cell => `"${cell}"`).join(','))
-        .join('\n');
+        .join('\n')
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'sales_report.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `sales_report_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
 }
 
-
-// PDF Export
 function exportToPDF() {
     const doc = new jsPDF()
-    const headers = [['#', 'Item', 'Type', 'Quantity', 'Purchase cost', 'Selling cost', 'Profit', 'Date']]
+    const headers = [['#', 'Item', 'Type', 'Qty', 'Purchase', 'Selling', 'Profit', 'Date']]
     const rows = flattenedItems.value.map((item, index) => [
         index + 1,
         item.sellable?.name || '—',
@@ -216,21 +322,29 @@ function exportToPDF() {
         formatDate(item.created_at)
     ])
 
+    doc.setFont(undefined, 'bold')
+    doc.setFontSize(16)
+    doc.text('Sales Report', 14, 10)
+    doc.setFont(undefined, 'normal')
+    doc.setFontSize(10)
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 18)
+
     autoTable(doc, {
         head: headers,
         body: rows,
-        startY: 10,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [22, 160, 133] }
+        startY: 25,
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [248, 250, 252] }
     })
 
-    // Add summary rows below table
-    const finalY = doc.lastAutoTable.finalY || 10
-    doc.setFontSize(10)
-    doc.text(`Total Sales: ${currency(totalSales.value)}`, 14, finalY + 10)
-    doc.text(`Total Profit: ${currency(totalProfit.value)}`, 14, finalY + 20)
+    const finalY = doc.lastAutoTable.finalY + 10
+    doc.setFont(undefined, 'bold')
+    doc.text(`Total Sales: ${currency(totalSales.value)}`, 14, finalY)
+    doc.text(`Total Profit: ${currency(totalProfit.value)}`, 14, finalY + 7)
+    doc.text(`Profit Margin: ${profitMargin.value}%`, 14, finalY + 14)
 
-    doc.save('sales_report.pdf')
+    doc.save(`sales_report_${new Date().toISOString().split('T')[0]}.pdf`)
 }
 
 const breadcrumbs = [

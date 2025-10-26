@@ -82,6 +82,15 @@ class SalePaymentController extends Controller
         ]);
     }
 
+    public function show( $payment)
+    {
+        $Payment = SalePayment::findOrFail($payment);
+        $Payment->load('sale.buyer');
+        return Inertia::render('Sales/Payments/Show',[
+            'payment' => $Payment,
+        ]);
+    }
+
 
 
 

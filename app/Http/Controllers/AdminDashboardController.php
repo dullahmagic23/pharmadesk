@@ -9,7 +9,6 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Activity;
-use App\Models\Patient;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Support\Facades\Auth;

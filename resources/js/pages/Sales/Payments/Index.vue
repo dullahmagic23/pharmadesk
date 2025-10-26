@@ -24,6 +24,7 @@ const selectedMethod = ref(props.filters.method || '')
 const selectedStatus = ref(props.filters.status || '')
 const fromDate = ref(props.filters.from_date || '')
 const toDate = ref(props.filters.to_date || '')
+const isExporting = ref(false)
 
 // Handle filter changes
 const applyFilters = () => {
@@ -48,6 +49,44 @@ const resetFilters = () => {
 const hasActiveFilters = computed(() => {
     return searchQuery.value || selectedMethod.value || selectedStatus.value || fromDate.value || toDate.value
 })
+
+// Export functionality
+const exportToCSV = async () => {
+    isExporting.value = true
+    try {
+        const response = await fetch('/payments/export', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+            },
+            body: JSON.stringify({
+                search: searchQuery.value,
+                method: selectedMethod.value,
+                status: selectedStatus.value,
+                from_date: fromDate.value,
+                to_date: toDate.value,
+            }),
+        })
+
+        if (!response.ok) throw new Error('Export failed')
+
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `payments-${new Date().toISOString().split('T')[0]}.csv`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+    } catch (error) {
+        console.error('Export error:', error)
+        alert('Failed to export payments')
+    } finally {
+        isExporting.value = false
+    }
+}
 
 // Status badge styling
 const getStatusConfig = (status) => {
@@ -112,18 +151,6 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             />
                         </div>
-                        <!-- <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Method</label>
-                            <select
-                                v-model="selectedMethod"
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            >
-                                <option value="">All Methods</option>
-                                <option v-for="method in methods" :key="method" :value="method">
-                                    {{ method }}
-                                </option>
-                            </select>
-                        </div> -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
                             <select
@@ -134,7 +161,6 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                                 <option value="paid">Paid</option>
                                 <option value="partial">Partial</option>
                                 <option value="unpaid">Unpaid</option>
-
                             </select>
                         </div>
                         <div>
@@ -168,12 +194,14 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                         >
                             <i class="fas fa-redo mr-2"></i>Reset
                         </button>
-                        <Link
-                            href="/payments?export=true"
-                            class="ml-auto px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition"
+                        <button
+                            @click="exportToCSV"
+                            :disabled="isExporting"
+                            class="ml-auto px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg font-medium transition"
                         >
-                            <i class="fas fa-download mr-2"></i>Export CSV
-                        </Link>
+                            <i :class="['fas', isExporting ? 'fa-spinner fa-spin' : 'fa-download', 'mr-2']"></i>
+                            {{ isExporting ? 'Exporting...' : 'Export CSV' }}
+                        </button>
                     </div>
                 </div>
 
@@ -186,7 +214,6 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Payment ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Customer</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Amount</th>
-                                    <!-- <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Method</th> -->
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Date</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Action</th>
@@ -205,9 +232,6 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                                     <td class="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
                                         {{ currency(payment.amount) }}
                                     </td>
-                                    <!-- <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                                        {{ payment.method }}
-                                    </td> -->
                                     <td class="px-6 py-4 text-sm">
                                         <span :class="[getStatusConfig(payment.sale.status).bg, getStatusConfig(payment.sale.status).text, 'px-3 py-1 rounded-full text-xs font-semibold']">
                                             {{ payment.sale.status }}
@@ -218,7 +242,7 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                                     </td>
                                     <td class="px-6 py-4 text-sm">
                                         <Link
-                                            :href="`/payments/${payment.id}`"
+                                            :href="route('sales-payments.show',  payment.id)"
                                             class="inline-flex items-center gap-1 px-3 py-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded transition text-xs font-medium"
                                         >
                                             <i class="fas fa-eye"></i>View
@@ -230,7 +254,7 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                                             button-label-text-color="text-red-600 hover:text-red-700"
                                             triggerVariant="ghost"
                                             :onConfirm="() => router.delete(`/sales-payments/${payment.id}`, { preserveScroll: true })"
-                                            />
+                                        />
                                     </td>
                                 </tr>
                             </tbody>

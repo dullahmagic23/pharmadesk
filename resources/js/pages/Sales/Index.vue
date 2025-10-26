@@ -144,7 +144,7 @@ const getStatusConfig = (status: string) => {
         <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
             <!-- Header -->
             <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
-                <div class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+                <div class="w-full mx-auto px-4 md:px-6 py-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
                             <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Sales History</h1>
@@ -174,7 +174,7 @@ const getStatusConfig = (status: string) => {
                 </div>
             </div>
 
-            <div class="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6">
+            <div class="w-full mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6">
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">

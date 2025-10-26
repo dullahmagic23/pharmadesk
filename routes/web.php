@@ -102,6 +102,7 @@ Route::middleware(['auth', 'log.activity'])->group(function () {
     Route::post('/sales/{sale}/payments', [SalePaymentController::class, 'store'])->name('sales.payments.store');
     Route::middleware(['auth'])->get('/pharmacist/dashboard', fn() => Inertia::render('Pharmacist/Dashboard'))->name('pharmacist.dashboard');
     Route::middleware(['auth'])->get('/doctor/dashboard', fn() => Inertia::render('Doctor/Dashboard'))->name('doctor.dashboard');
+    Route::post('/payments/export', [PaymentController::class, 'export'])->name('payments.export');
 });
 Route::get('/license',[LicenseCheckController::class,'index'])->name('license.index');
 Route::get('/license-check',[LicenseCheckController::class,'index'])->name('license.check');
