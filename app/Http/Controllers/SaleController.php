@@ -9,13 +9,12 @@ use App\Models\Patient;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Stock;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Str;
+use App\Models\User;
+use App\Notifications\DeletedSalesNotification;
 
 class SaleController extends Controller
 {
@@ -183,6 +182,11 @@ class SaleController extends Controller
             $sale->payments()->delete();
             if ($sale->receipt) {
                 $sale->receipt->delete();
+            }
+
+            $admins = User::role('admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new DeletedSalesNotification($sale));
             }
 
             // Delete the sale
