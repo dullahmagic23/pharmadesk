@@ -331,10 +331,15 @@ const getAlertBadgeColor = (type: 'expired' | 'expiring' | 'lowStock'): string =
 const formatPrice = (price?: number): string => {
   return price ? `$${parseFloat(String(price)).toFixed(2)}` : '-'
 }
+
+const breadcrumbs = [
+  { title: 'Dashboard', href: '/dashboard' },
+  { title: 'Admin', href: '/admin/dashboard' },
+]
 </script>
 
 <template>
-  <AppLayout>
+  <AppLayout :breadcrumbs="breadcrumbs">
     <Head title="Admin Dashboard" />
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
       <!-- Header -->

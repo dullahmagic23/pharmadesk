@@ -112,7 +112,7 @@ const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 
                 <!-- Header -->
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Payments</h1>
+                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Sales Payments</h1>
                         <p class="text-gray-600 dark:text-gray-400 mt-1">Manage and track all payment transactions</p>
                     </div>
                 </div>

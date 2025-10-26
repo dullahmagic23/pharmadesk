@@ -86,8 +86,12 @@ class SalePaymentController extends Controller
     {
         $Payment = SalePayment::findOrFail($payment);
         $Payment->load('sale.buyer');
+        $other_payments = SalePayment::where('sale_id', $Payment->sale_id)
+            ->where('id', '!=', $Payment->id)
+            ->get();
         return Inertia::render('Sales/Payments/Show',[
             'payment' => $Payment,
+            'other_payments' => $other_payments,
         ]);
     }
 

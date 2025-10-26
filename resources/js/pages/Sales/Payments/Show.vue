@@ -7,12 +7,13 @@ import ConfirmDeleteDialog from '@/components/ConfirmDeleteDialog.vue'
 
 const props = defineProps({
     payment: Object,
+    other_payments: Array,
 })
 
 const breadcrumbs = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Sales', href: '/sales' },
-    { title: 'Payments', href: '/payments' },
+    { title: 'Payments', href: '/sales-payments' },
     { title: `Payment #${props.payment.id}`, href: '#' },
 ]
 
@@ -312,6 +313,30 @@ const handleDelete = () => {
                                     <div>
                                         <p class="font-semibold text-gray-900 dark:text-white">Last Updated</p>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDate(payment.updated_at) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other Payments -->
+                        <div v-if="other_payments && other_payments.length > 0" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                                <i class="fas fa-list text-purple-600 dark:text-purple-400"></i>
+                                Other Payments for This Sale
+                            </h3>
+                            <div class="space-y-3">
+                                <div v-for="p in other_payments" :key="p.id" class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                    <div class="flex-1">
+                                        <Link
+                                            :href="`/sales-payments/${p.id}`"
+                                            class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                                        >
+                                            #{{ p.id.slice(0, 8) }}
+                                        </Link>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ formatDateShort(p.created_at) }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-gray-900 dark:text-white">{{ currency(p.amount) }}</p>
                                     </div>
                                 </div>
                             </div>
